@@ -1,0 +1,73 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:oxm="http://www.springframework.org/schema/oxm" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/oxm http://www.springframework.org/schema/oxm/spring-oxm-3.2.xsd
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<context:component-scan base-package="mx.skyguardian.controltower.rest" />
+
+	<mvc:annotation-driven />
+	
+	<oxm:jaxb2-marshaller id="marshaller">
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.Unit" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.Units" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.Vehicle" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.Vehicles" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.VehicleHistory" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.VehicleHistoryItem" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.GeoPosition" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.LastMsgReport" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.LastMsgReport251" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.LastMsgReport252" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.LastMsgReport253" />
+		<oxm:class-to-be-bound name="mx.skyguardian.controltower.bean.LastMsgReport254" />
+		
+	</oxm:jaxb2-marshaller>
+
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+			</map>
+		</property>
+
+		<property name="defaultViews">
+			<list>
+				<!-- JSON View -->
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+				</bean>
+
+				<!-- JAXB XML View -->
+				<bean class="org.springframework.web.servlet.view.xml.MarshallingView">
+					<constructor-arg ref="marshaller">
+					</constructor-arg>
+				</bean>
+			</list>
+		</property>
+		<property name="ignoreAcceptHeader" value="false" />
+
+	</bean>
+	
+	<!-- If no extension matched, use XML view -->
+	<bean class="org.springframework.web.servlet.view.xml.MarshallingView">
+					<constructor-arg ref="marshaller">
+					</constructor-arg>
+				</bean>
+	
+				
+	<bean id="wialonUnitController" class="mx.skyguardian.controltower.rest.WialonUnitController">
+		<property name="controlTowerManager" ref="controlTowerManager" />
+	</bean>
+
+</beans>
