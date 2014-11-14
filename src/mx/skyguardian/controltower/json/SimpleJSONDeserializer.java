@@ -9,7 +9,8 @@ import javax.annotation.Resource;
 
 import mx.skyguardian.controltower.bean.AbstractWialonEntity;
 import mx.skyguardian.controltower.bean.GeoPosition;
-import mx.skyguardian.controltower.bean.LastMsgReport;
+import mx.skyguardian.controltower.bean.LastMsgReport0;
+import mx.skyguardian.controltower.bean.LastMsgReportBase;
 import mx.skyguardian.controltower.bean.LastMsgReport251;
 import mx.skyguardian.controltower.bean.LastMsgReport252;
 import mx.skyguardian.controltower.bean.LastMsgReport253;
@@ -18,6 +19,7 @@ import mx.skyguardian.controltower.http.remoting.AbstractUser;
 import mx.skyguardian.controltower.http.remoting.IWialonHTTPRequestExecutor;
 import mx.skyguardian.controltower.util.AppUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,8 +91,12 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 		int reportID = Integer.parseInt((pObject.isNull("report_id"))?"0":pObject.get("report_id").toString());
 		AbstractWialonEntity report = null;
 		switch (reportID) {
+			case 0:
+				report = new LastMsgReport0();
+				setReport0(report, pObject);
+				return report;
 			case 2:
-				report = new LastMsgReport();
+				report = new LastMsgReportBase();
 				setReport2(report, pObject);
 				return report;
 				
@@ -117,86 +123,103 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 				setReport254(report254, pObject);
 				return report254;
 			default:
-				report = new LastMsgReport();
+				report = new LastMsgReportBase();
 				setReport2(report, pObject);
 				return report;
 		}
 	}
 	
+	private void setReport0(AbstractWialonEntity report, JSONObject jsonReport) {
+		((LastMsgReport0) report).setReport_id((jsonReport.isNull("report_id")) ? StringUtils.EMPTY :jsonReport.get("report_id").toString());
+		((LastMsgReport0) report).setGps_acc((jsonReport.isNull("gps_acc")) ? StringUtils.EMPTY :jsonReport.get("gps_acc").toString());
+		((LastMsgReport0) report).setPacket_type((jsonReport.isNull("packet_type")) ? StringUtils.EMPTY :jsonReport.get("packet_type").toString());
+		((LastMsgReport0) report).setMcc((jsonReport.isNull("mcc")) ? StringUtils.EMPTY :jsonReport.get("mcc").toString());
+		((LastMsgReport0) report).setMnc((jsonReport.isNull("mnc")) ? StringUtils.EMPTY :jsonReport.get("mnc").toString());
+		((LastMsgReport0) report).setLac((jsonReport.isNull("lac")) ? StringUtils.EMPTY :jsonReport.get("lac").toString());
+		((LastMsgReport0) report).setCell_id((jsonReport.isNull("cell_id")) ? StringUtils.EMPTY :jsonReport.get("cell_id").toString());
+		((LastMsgReport0) report).setMileage((jsonReport.isNull("mileage")) ? StringUtils.EMPTY :jsonReport.get("mileage").toString());
+		((LastMsgReport0) report).setAdc1((jsonReport.isNull("adc1")) ? StringUtils.EMPTY :jsonReport.get("adc1").toString());
+		((LastMsgReport0) report).setPwr_ext((jsonReport.isNull("pwr_ext")) ? StringUtils.EMPTY :jsonReport.get("pwr_ext").toString());
+		((LastMsgReport0) report).setNumber((jsonReport.isNull("number")) ? StringUtils.EMPTY :jsonReport.get("number").toString());
+	}
+	
 	private void setReport2(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReport) report).setReportId(Integer.parseInt((jsonReport.isNull("report_id"))?"0":jsonReport.get("report_id").toString()));
-		((LastMsgReport) report).setOdometer(Double.parseDouble((jsonReport.isNull("odometer"))?"0.0":jsonReport.get("odometer").toString()));
-		((LastMsgReport) report).setHdop(Double.parseDouble((jsonReport.isNull("hdop"))?"0":jsonReport.get("hdop").toString()));
-		((LastMsgReport) report).setAdc1(Double.parseDouble((jsonReport.isNull("adc1"))?"0":jsonReport.get("adc1").toString()));
-		((LastMsgReport) report).setTemp1(Double.parseDouble((jsonReport.isNull("temp1"))?"0":jsonReport.get("temp1").toString()));
-		((LastMsgReport) report).setTemp2(Double.parseDouble((jsonReport.isNull("temp2"))?"0":jsonReport.get("temp2").toString()));
-		((LastMsgReport) report).setDl(Integer.parseInt((jsonReport.isNull("DL"))?"0":jsonReport.get("DL").toString()));
-		((LastMsgReport) report).setTw(Integer.parseInt((jsonReport.isNull("TW"))?"0":jsonReport.get("TW").toString()));
-		((LastMsgReport) report).setMt(Integer.parseInt((jsonReport.isNull("MT"))?"0":jsonReport.get("MT").toString()));
-		((LastMsgReport) report).setIp(Integer.parseInt((jsonReport.isNull("IP"))?"0":jsonReport.get("IP").toString()));
-		((LastMsgReport) report).setPs(Integer.parseInt((jsonReport.isNull("PS"))?"0":jsonReport.get("PS").toString()));
-		((LastMsgReport) report).setSs(Integer.parseInt((jsonReport.isNull("SS"))?"0":jsonReport.get("SS").toString()));
-		((LastMsgReport) report).setHa(Integer.parseInt((jsonReport.isNull("HA"))?"0":jsonReport.get("HA").toString()));
-		((LastMsgReport) report).setHb(Integer.parseInt((jsonReport.isNull("HB"))?"0":jsonReport.get("HB").toString()));
-		((LastMsgReport) report).setHc(Integer.parseInt((jsonReport.isNull("HC"))?"0":jsonReport.get("HC").toString()));
-		((LastMsgReport) report).setJd(Integer.parseInt((jsonReport.isNull("JD"))?"0":jsonReport.get("JD").toString()));
-		((LastMsgReport) report).setBl(Integer.parseInt((jsonReport.isNull("BL"))?"0":jsonReport.get("BL").toString()));
-		((LastMsgReport) report).setEg(Integer.parseInt((jsonReport.isNull("EG"))?"0":jsonReport.get("EG").toString()));
-		((LastMsgReport) report).setMv(Integer.parseInt((jsonReport.isNull("MV"))?"0":jsonReport.get("MV").toString()));
-		((LastMsgReport) report).setRd(Integer.parseInt((jsonReport.isNull("RD"))?"0":jsonReport.get("RD").toString()));
-		((LastMsgReport) report).setOp(Integer.parseInt((jsonReport.isNull("OP"))?"0":jsonReport.get("OP").toString()));
-		((LastMsgReport) report).setIn0(Integer.parseInt((jsonReport.isNull("IN0"))?"0":jsonReport.get("IN0").toString()));
-		((LastMsgReport) report).setIn1(Integer.parseInt((jsonReport.isNull("IN1"))?"0":jsonReport.get("IN1").toString()));
-		((LastMsgReport) report).setOd(Integer.parseInt((jsonReport.isNull("OD"))?"0":jsonReport.get("OD").toString()));
+		((LastMsgReportBase) report).setReportId((jsonReport.isNull("report_id"))? StringUtils.EMPTY :jsonReport.get("report_id").toString());			
+		((LastMsgReportBase) report).setOdometer((jsonReport.isNull("odometer"))? StringUtils.EMPTY :jsonReport.get("odometer").toString());				
+		((LastMsgReportBase) report).setHdop((jsonReport.isNull("hdop"))? StringUtils.EMPTY :jsonReport.get("hdop").toString());			   
+		((LastMsgReportBase) report).setAdc1((jsonReport.isNull("adc1"))? StringUtils.EMPTY :jsonReport.get("adc1").toString());			   
+		((LastMsgReportBase) report).setTemp1((jsonReport.isNull("temp1"))? StringUtils.EMPTY :jsonReport.get("temp1").toString());			  
+		((LastMsgReportBase) report).setTemp2((jsonReport.isNull("temp2"))? StringUtils.EMPTY :jsonReport.get("temp2").toString());			  
+		((LastMsgReportBase) report).setDl((jsonReport.isNull("dl"))? StringUtils.EMPTY :jsonReport.get("dl").toString());			     
+		((LastMsgReportBase) report).setTw((jsonReport.isNull("tw"))? StringUtils.EMPTY :jsonReport.get("tw").toString());			     
+		((LastMsgReportBase) report).setMT((jsonReport.isNull("MT"))? StringUtils.EMPTY :jsonReport.get("MT").toString());			     
+		((LastMsgReportBase) report).setIp((jsonReport.isNull("ip"))? StringUtils.EMPTY :jsonReport.get("ip").toString());			     
+		((LastMsgReportBase) report).setPs((jsonReport.isNull("ps"))? StringUtils.EMPTY :jsonReport.get("ps").toString());			     
+		((LastMsgReportBase) report).setSs((jsonReport.isNull("ss"))? StringUtils.EMPTY :jsonReport.get("ss").toString());			     
+		((LastMsgReportBase) report).setHa((jsonReport.isNull("ha"))? StringUtils.EMPTY :jsonReport.get("ha").toString());			     
+		((LastMsgReportBase) report).setHb((jsonReport.isNull("hb"))? StringUtils.EMPTY :jsonReport.get("hb").toString());			     
+		((LastMsgReportBase) report).setHc((jsonReport.isNull("hc"))? StringUtils.EMPTY :jsonReport.get("hc").toString());			     
+		((LastMsgReportBase) report).setJd((jsonReport.isNull("jd"))? StringUtils.EMPTY :jsonReport.get("jd").toString());			     
+		((LastMsgReportBase) report).setBl((jsonReport.isNull("bl"))? StringUtils.EMPTY :jsonReport.get("bl").toString());			     
+		((LastMsgReportBase) report).setEG((jsonReport.isNull("EG"))? StringUtils.EMPTY :jsonReport.get("EG").toString());			     
+		((LastMsgReportBase) report).setBV((jsonReport.isNull("BV"))? StringUtils.EMPTY :jsonReport.get("BV").toString());			     
+		((LastMsgReportBase) report).setMV((jsonReport.isNull("MV"))? StringUtils.EMPTY :jsonReport.get("MV").toString());			     
+		((LastMsgReportBase) report).setRd((jsonReport.isNull("rd"))? StringUtils.EMPTY :jsonReport.get("rd").toString());			     
+		((LastMsgReportBase) report).setOp((jsonReport.isNull("op"))? StringUtils.EMPTY :jsonReport.get("op").toString());			     
+		((LastMsgReportBase) report).setIn0((jsonReport.isNull("in0"))? StringUtils.EMPTY :jsonReport.get("in0").toString());			    
+		((LastMsgReportBase) report).setIn1((jsonReport.isNull("in1"))? StringUtils.EMPTY :jsonReport.get("in1").toString());			    
+		((LastMsgReportBase) report).setIn2((jsonReport.isNull("in2"))? StringUtils.EMPTY :jsonReport.get("in2").toString());			    
+		((LastMsgReportBase) report).setIn3((jsonReport.isNull("in3"))? StringUtils.EMPTY :jsonReport.get("in3").toString());			    
+		((LastMsgReportBase) report).setOd((jsonReport.isNull("od"))? StringUtils.EMPTY :jsonReport.get("od").toString());			     
+		((LastMsgReportBase) report).setGQ((jsonReport.isNull("GQ"))? StringUtils.EMPTY :jsonReport.get("GQ").toString());			     
+		((LastMsgReportBase) report).setGS((jsonReport.isNull("GS"))? StringUtils.EMPTY :jsonReport.get("GS").toString());			     
+
+		((LastMsgReportBase) report).setPC((jsonReport.isNull("PC"))? StringUtils.EMPTY :jsonReport.get("PC").toString());			      
+		((LastMsgReportBase) report).setRP((jsonReport.isNull("RP"))? StringUtils.EMPTY :jsonReport.get("RP").toString());			      
+		((LastMsgReportBase) report).setFL((jsonReport.isNull("FL"))? StringUtils.EMPTY :jsonReport.get("FL").toString());			      
+		((LastMsgReportBase) report).setML((jsonReport.isNull("ML"))? StringUtils.EMPTY :jsonReport.get("ML").toString());			      
+		((LastMsgReportBase) report).setFC((jsonReport.isNull("FC"))? StringUtils.EMPTY :jsonReport.get("FC").toString());			      
+		((LastMsgReportBase) report).setAV((jsonReport.isNull("AV"))? StringUtils.EMPTY :jsonReport.get("AV").toString());			      
+		((LastMsgReportBase) report).setGL((jsonReport.isNull("GL"))? StringUtils.EMPTY :jsonReport.get("GL").toString());			      
+		((LastMsgReportBase) report).setFuel_n((jsonReport.isNull("fuel_n"))? StringUtils.EMPTY :jsonReport.get("fuel_n").toString());			  
+		((LastMsgReportBase) report).setFuel_level((jsonReport.isNull("fuel_level"))? StringUtils.EMPTY :jsonReport.get("fuel_level").toString());
+		((LastMsgReportBase) report).setJ1708_odo((jsonReport.isNull("j1708_odo"))? StringUtils.EMPTY :jsonReport.get("j1708_odo").toString());				
+		((LastMsgReportBase) report).setJ1708_speed((jsonReport.isNull("j1708_speed"))? StringUtils.EMPTY :jsonReport.get("j1708_speed").toString()); 
+		((LastMsgReportBase) report).setJ1708_fuel_level((jsonReport.isNull("j1708_fuel_level"))? StringUtils.EMPTY :jsonReport.get("j1708_fuel_level").toString());
+		((LastMsgReportBase) report).setOp0((jsonReport.isNull("op0"))? StringUtils.EMPTY :jsonReport.get("op0").toString());				     
+		((LastMsgReportBase) report).setOp1((jsonReport.isNull("op1"))? StringUtils.EMPTY :jsonReport.get("op1").toString());				     
+		((LastMsgReportBase) report).setOp2((jsonReport.isNull("op2"))? StringUtils.EMPTY :jsonReport.get("op2").toString());				     
+		((LastMsgReportBase) report).setOp3((jsonReport.isNull("op3"))? StringUtils.EMPTY :jsonReport.get("op3").toString());				     
+		((LastMsgReportBase) report).setAvl_driver((jsonReport.isNull("avl_driver"))? StringUtils.EMPTY :jsonReport.get("avl_driver").toString()); 
 	}
 	
 	
 	private void setReport251(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReport251) report).setEngineRpm(Integer.parseInt((jsonReport.isNull("engine_rpm"))?"0":jsonReport.get("engine_rpm").toString()));
-		((LastMsgReport251) report).setJ1939Speed(Integer.parseInt((jsonReport.isNull("j1939_speed"))?"0":jsonReport.get("j1939_speed").toString()));
-		((LastMsgReport251) report).setFuelCons(Integer.parseInt((jsonReport.isNull("fuel_cons"))?"0":jsonReport.get("fuel_cons").toString()));
-		((LastMsgReport251) report).setJ1939FuelLevel(Integer.parseInt((jsonReport.isNull("j1939_fuel_level"))?"0":jsonReport.get("j1939_fuel_level").toString()));
-		((LastMsgReport251) report).setAxle1(Integer.parseInt((jsonReport.isNull("axle1"))?"0":jsonReport.get("axle1").toString()));
-		((LastMsgReport251) report).setAxle2(Integer.parseInt((jsonReport.isNull("axle2"))?"0":jsonReport.get("axle2").toString()));
-		((LastMsgReport251) report).setAxle3(Integer.parseInt((jsonReport.isNull("axle3"))?"0":jsonReport.get("axle3").toString()));
-		((LastMsgReport251) report).setAxle4(Integer.parseInt((jsonReport.isNull("axle4"))?"0":jsonReport.get("axle4").toString()));
-		((LastMsgReport251) report).setEngBoostPressure(Integer.parseInt((jsonReport.isNull("eng_boost_pressure"))?"0":jsonReport.get("eng_boost_pressure").toString()));
-		((LastMsgReport251) report).setCoolantTemp(Integer.parseInt((jsonReport.isNull("coolant_temp"))?"0":jsonReport.get("coolant_temp").toString()));
-		((LastMsgReport251) report).setAccelPos(Integer.parseInt((jsonReport.isNull("accel_pos"))?"0":jsonReport.get("accel_pos").toString()));
-		((LastMsgReport251) report).setBrakePos(Integer.parseInt((jsonReport.isNull("brake_pos"))?"0":jsonReport.get("brake_pos").toString()));
-		((LastMsgReport251) report).setPtAirPressure(Integer.parseInt((jsonReport.isNull("pt_air_pressure"))?"0":jsonReport.get("pt_air_pressure").toString()));
-		((LastMsgReport251) report).setBrakePressure1(Integer.parseInt((jsonReport.isNull("brake_pressure1"))?"0":jsonReport.get("brake_pressure1").toString()));
-		((LastMsgReport251) report).setBrakePressure2(Integer.parseInt((jsonReport.isNull("brake_pressure2"))?"0":jsonReport.get("brake_pressure2").toString()));
+		((LastMsgReport251) report).setEngine_rpm((jsonReport.isNull("engine_rpm"))? StringUtils.EMPTY :jsonReport.get("engine_rpm").toString());
+		((LastMsgReport251) report).setFuel_cons((jsonReport.isNull("fuel_cons"))? StringUtils.EMPTY :jsonReport.get("fuel_cons").toString());
+		((LastMsgReport251) report).setJ1939_fuel_level((jsonReport.isNull("j1939_fuel_level"))? StringUtils.EMPTY :jsonReport.get("j1939_fuel_level").toString());
 	}
 	
 	private void setReport252(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReport252) report).setJ1939Odo(Integer.parseInt((jsonReport.isNull("j1939_odo"))?"0":jsonReport.get("j1939_odo").toString()));
-		((LastMsgReport252) report).setTotalFuel(Integer.parseInt((jsonReport.isNull("total_fuel"))?"0":jsonReport.get("total_fuel").toString()));
-		((LastMsgReport252) report).setBrakeTimes(Integer.parseInt((jsonReport.isNull("brake_times"))?"0":jsonReport.get("brake_times").toString()));
-		((LastMsgReport252) report).setClutchTimes(Integer.parseInt((jsonReport.isNull("clutch_times"))?"0":jsonReport.get("clutch_times").toString()));
-		((LastMsgReport252) report).setCruiseTime(Integer.parseInt((jsonReport.isNull("cruise_time"))?"0":jsonReport.get("cruise_time").toString()));
-		((LastMsgReport252) report).setPtoTime(Integer.parseInt((jsonReport.isNull("pto_time"))?"0":jsonReport.get("pto_time").toString()));
+		((LastMsgReport252) report).setJ1939_odo((jsonReport.isNull("j1939_odo"))? StringUtils.EMPTY :jsonReport.get("j1939_odo").toString());
+		((LastMsgReport252) report).setTotal_fuel((jsonReport.isNull("total_fuel"))? StringUtils.EMPTY :jsonReport.get("total_fuel").toString());
 	}
 	
 	private void setReport253(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReport253) report).setDriversState(Integer.parseInt((jsonReport.isNull("drivers_state"))?"0":jsonReport.get("drivers_state").toString()));
-		((LastMsgReport253) report).setDriver1Card(Integer.parseInt((jsonReport.isNull("driver1_card"))?"0":jsonReport.get("driver1_card").toString()));
-		((LastMsgReport253) report).setDriver2Card(Integer.parseInt((jsonReport.isNull("driver2_card"))?"0":jsonReport.get("driver2_card").toString()));
-		((LastMsgReport253) report).setTachographStatus(Integer.parseInt((jsonReport.isNull("tachograph_status"))?"0":jsonReport.get("tachograph_status").toString()));
-		((LastMsgReport253) report).setTachographSpeed(Integer.parseInt((jsonReport.isNull("tachograph_speed"))?"0":jsonReport.get("tachograph_speed").toString()));
-		((LastMsgReport253) report).setTachoExtInfo(Integer.parseInt((jsonReport.isNull("tacho_ext_info"))?"0":jsonReport.get("tacho_ext_info").toString()));
-		
-		((LastMsgReport253) report).setIn2(Integer.parseInt((jsonReport.isNull("IN2"))?"0":jsonReport.get("IN2").toString()));
-		((LastMsgReport253) report).setGq(Integer.parseInt((jsonReport.isNull("GQ"))?"0":jsonReport.get("GQ").toString()));
-		((LastMsgReport253) report).setGs(Integer.parseInt((jsonReport.isNull("GS"))?"0":jsonReport.get("GS").toString()));
+		((LastMsgReport253) report).setDrivers_state((jsonReport.isNull("drivers_state"))? StringUtils.EMPTY :jsonReport.get("drivers_state").toString());
+		((LastMsgReport253) report).setDriver1_card((jsonReport.isNull("driver1_card"))? StringUtils.EMPTY :jsonReport.get("driver1_card").toString());
+		((LastMsgReport253) report).setDriver2_card((jsonReport.isNull("driver2_card"))? StringUtils.EMPTY :jsonReport.get("driver2_card").toString());
+		((LastMsgReport253) report).setTachograph_status((jsonReport.isNull("tachograph_status"))? StringUtils.EMPTY :jsonReport.get("tachograph_status").toString());
+		((LastMsgReport253) report).setTachograph_speed((jsonReport.isNull("tachograph_speed"))? StringUtils.EMPTY :jsonReport.get("tachograph_speed").toString());
+		((LastMsgReport253) report).setTacho_ext_info((jsonReport.isNull("tacho_ext_info"))? StringUtils.EMPTY :jsonReport.get("tacho_ext_info").toString());
 	}
 	
 	private void setReport254(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReport254) report).setVehicleId(Integer.parseInt((jsonReport.isNull("vehicle_id"))?"0":jsonReport.get("vehicle_id").toString()));
-		((LastMsgReport254) report).setServiceDist(Integer.parseInt((jsonReport.isNull("service_dist"))?"0":jsonReport.get("service_dist").toString()));
-		((LastMsgReport254) report).setEngHours(Integer.parseInt((jsonReport.isNull("eng_hours"))?"0":jsonReport.get("eng_hours").toString()));
-		((LastMsgReport254) report).setEngStarter(Integer.parseInt((jsonReport.isNull("eng_starter"))?"0":jsonReport.get("eng_starter").toString()));
-		((LastMsgReport254) report).setAbsActive(Integer.parseInt((jsonReport.isNull("abs_active"))?"0":jsonReport.get("abs_active").toString()));
+		((LastMsgReport254) report).setVehicle_id((jsonReport.isNull("vehicle_id"))? StringUtils.EMPTY :jsonReport.get("vehicle_id").toString());
+		((LastMsgReport254) report).setService_dist((jsonReport.isNull("service_dist"))? StringUtils.EMPTY :jsonReport.get("service_dist").toString());
+		((LastMsgReport254) report).setEng_hours((jsonReport.isNull("eng_hours"))? StringUtils.EMPTY :jsonReport.get("eng_hours").toString());
+		((LastMsgReport254) report).setEng_starter((jsonReport.isNull("eng_starter"))? StringUtils.EMPTY :jsonReport.get("eng_starter").toString());
+		((LastMsgReport254) report).setAbs_active((jsonReport.isNull("abs_active"))? StringUtils.EMPTY :jsonReport.get("abs_active").toString());
 	}
 
 	public void setHttpReqExecutor(IWialonHTTPRequestExecutor httpReqExecutor) {

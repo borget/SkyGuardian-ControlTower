@@ -53,7 +53,8 @@
 				<value>mx.skyguardian.controltower.bean.VehicleHistory</value>
 				<value>mx.skyguardian.controltower.bean.VehicleHistoryItem</value>
 				<value>mx.skyguardian.controltower.bean.GeoPosition</value>
-				<value>mx.skyguardian.controltower.bean.LastMsgReport</value>
+				<value>mx.skyguardian.controltower.bean.LastMsgReportBase</value>
+				<value>mx.skyguardian.controltower.bean.LastMsgReport0</value>
 				<value>mx.skyguardian.controltower.bean.LastMsgReport251</value>
 				<value>mx.skyguardian.controltower.bean.LastMsgReport252</value>
 				<value>mx.skyguardian.controltower.bean.LastMsgReport253</value>

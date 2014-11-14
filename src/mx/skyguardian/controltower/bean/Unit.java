@@ -9,7 +9,7 @@ public class Unit extends AbstractWialonEntity {
 	private String unitName = StringUtils.EMPTY;
 	private Long unitId = -1L;
 	private AbstractWialonEntity geoPosition = new GeoPosition();
-	private AbstractWialonEntity lastMsgReport = new LastMsgReport();
+	private AbstractWialonEntity lastMsgReport = new LastMsgReportBase();
 
 	public Unit() {
 		

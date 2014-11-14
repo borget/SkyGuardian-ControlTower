@@ -1,52 +1,31 @@
 package mx.skyguardian.controltower.bean;
 
-public class LastMsgReport252 extends LastMsgReport {
-	private Integer j1939Odo = -1;
-	private Integer totalFuel = -1;
-	private Integer brakeTimes = -1;
-	private Integer clutchTimes = -1;
-	private Integer cruiseTime = -1;
-	private Integer ptoTime = -1;
+public class LastMsgReport252 extends LastMsgReportBase {
+	private String j1939_odo = null;
+	private String total_fuel = null;
 	
-	public LastMsgReport252 () {
+	public LastMsgReport252() {
 		
 	}
 	
-	public Integer getJ1939Odo() {
-		return j1939Odo;
+	public LastMsgReport252(String j1939_odo, String total_fuel) {
+		super();
+		this.j1939_odo = j1939_odo;
+		this.total_fuel = total_fuel;
 	}
-	public void setJ1939Odo(Integer j1939Odo) {
-		this.j1939Odo = j1939Odo;
+	public String getJ1939_odo() {
+		return j1939_odo;
 	}
-	public Integer getTotalFuel() {
-		return totalFuel;
+	public void setJ1939_odo(String j1939_odo) {
+		this.j1939_odo = j1939_odo;
 	}
-	public void setTotalFuel(Integer totalFuel) {
-		this.totalFuel = totalFuel;
+	public String getTotal_fuel() {
+		return total_fuel;
 	}
-	public Integer getBrakeTimes() {
-		return brakeTimes;
+	public void setTotal_fuel(String total_fuel) {
+		this.total_fuel = total_fuel;
 	}
-	public void setBrakeTimes(Integer brakeTimes) {
-		this.brakeTimes = brakeTimes;
-	}
-	public Integer getClutchTimes() {
-		return clutchTimes;
-	}
-	public void setClutchTimes(Integer clutchTimes) {
-		this.clutchTimes = clutchTimes;
-	}
-	public Integer getCruiseTime() {
-		return cruiseTime;
-	}
-	public void setCruiseTime(Integer cruiseTime) {
-		this.cruiseTime = cruiseTime;
-	}
-	public Integer getPtoTime() {
-		return ptoTime;
-	}
-	public void setPtoTime(Integer ptoTime) {
-		this.ptoTime = ptoTime;
-	}
-
+	
+	
 }
+

@@ -6,7 +6,7 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 		
-	<util:properties id="appProperties" location="file:///home/alberto/skyguardian/workspace/SkyGuardianControlTower/config/appProperties.properties"/>
+	<util:properties id="appProperties" location="file:///home/alberto/skyguardian/git-workspace/SkyGuardian-ControlTower/config/appProperties.properties"/>
 	
 	<bean id="wialonHTTPExecutor" class="mx.skyguardian.controltower.http.remoting.SimpleWialonHTTPRequestExecutor">
 		<property name="appProperties" ref = "appProperties"></property>

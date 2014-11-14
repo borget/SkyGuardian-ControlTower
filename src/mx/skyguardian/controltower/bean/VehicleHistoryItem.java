@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="history", namespace="http://mx.skyguardian.controltower")
 public class VehicleHistoryItem extends AbstractWialonEntity{
 	private AbstractWialonEntity geoPosition = new GeoPosition();
-	private AbstractWialonEntity lastMsgReport = new LastMsgReport();
+	private AbstractWialonEntity lastMsgReport = new LastMsgReportBase();
 	
 	public VehicleHistoryItem() {
 		

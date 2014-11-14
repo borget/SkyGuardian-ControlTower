@@ -2,6 +2,8 @@ package mx.skyguardian.controltower.rest;
 
 import java.io.IOException;
 
+import mx.skyguardian.controltower.bean.AbstractWialonEntity;
+import mx.skyguardian.controltower.bean.EmptyUnit;
 import mx.skyguardian.controltower.bean.Encryptor;
 import mx.skyguardian.controltower.bean.Unit;
 import mx.skyguardian.controltower.bean.Units;
@@ -33,19 +35,19 @@ public class WialonUnitController {
 	// //////////////////////// @ResponseBody ////////////////////////
 
 	@RequestMapping(method = RequestMethod.GET, value = "/unit/{id}", headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-	public @ResponseBody Unit getUnitById(
+	public @ResponseBody AbstractWialonEntity getUnitById(
 			@PathVariable String id, 
 			@RequestParam("userName") String userName, 
 			@RequestParam("password") String password) throws WialonInternalServerError, Exception {
 		
 		try {
-			return (Unit) controlTowerManager.getUnit(userName, password, id);
+			return (AbstractWialonEntity) controlTowerManager.getUnit(userName, password, id);
 		} catch (JSONException je) {
 			log.error("JSONException Catch");
 			je.printStackTrace();
 		}
 		
-		return new Unit();
+		return new EmptyUnit();
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/units", headers = "Accept=text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
