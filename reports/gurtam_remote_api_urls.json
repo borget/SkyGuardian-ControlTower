@@ -1,0 +1,151 @@
+#gS5zzasfw
+
+
+wialon.core.Errors.getErrorText(1)
+"Invalid session"
+wialon.core.Errors.getErrorText(2)
+"Invalid service"
+wialon.core.Errors.getErrorText(3)
+"Invalid result"
+wialon.core.Errors.getErrorText(4)
+"Invalid input"
+wialon.core.Errors.getErrorText(5)
+"Error performing request"
+wialon.core.Errors.getErrorText(6)
+"Unknown error"
+wialon.core.Errors.getErrorText(7)
+"Access denied"
+wialon.core.Errors.getErrorText(8)
+"Invalid user name or password"
+wialon.core.Errors.getErrorText(9)
+"Authorization server is unavailable, please try again later"
+wialon.core.Errors.getErrorText(10)
+"Abort batch request"
+wialon.core.Errors.getErrorText(11)
+"Invalid user name or e-mail"
+
+4 = nivel combustible
+https://hst-api.wialon.com/wialon/ajax.html?svc=unit/calc_last_message&params={%22unitId%22:12011118}&sid=81a378a461be05204f14eb7cca990b9f
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=unit/get_report_settings&params={"itemId":12011118}&sid=508c14e22229a9580d04de513ab8d453
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=unit/calc_sensors&params={%22unitId%22:12011118}&sid=508c14e22229a9580d04de513ab8d453
+
+load first interval and then it is possible to calculate sensors
+24hrs
+2014 November 27 00:00
+2014 November 27 23:59
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/load_interval&params={%22itemId%22:12011118,%22timeFrom%22:1417068000,%22timeTo%22:1417154399,%22flags%22:0x0000,%22flagsMask%22:0xFF00,%22loadCount%22:0xffffffff}&sid=f7c9f5340b0fe416e3a2c044ed92466e
+https://hst-api.wialon.com/wialon/ajax.html?svc=unit/calc_sensors&params={%22source%22:%22%22,%22indexFrom%22:0,%22indexTo%22:0xffffffff,%22unitId%22:12011118,%22sensorId%22:4}&sid=f7c9f5340b0fe416e3a2c044ed92466e
+http://localhost:8080/SkyGuardianControlTower/service/unit/12011118?userName=serviacero&password=uu8dMGl3DfvDKemyASGcXQ==
+
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=core/login&params=%7B%22user%22:%22tescobedo%22,%22password%22:%22sky2013%22%7D
+https://hst-api.wialon.com/wialon/ajax.html?svc=core/search_item&params={%22id%22:1220354,%22flags%22:1025}&sid=f78ff5a47a53ef0b3d83c2be160112b9
+http://198.71.59.110:8080/SkyGuardianControlTower/service/unit/1220354?userName=tescobedo
+
+
+https://hst-api.wialon.com/gis_geocode?coords=[%7B%22lon%22:-100.440833,%22lat%22:20.630471%7D]&flags=1255211008&uid=60120&params={%22user%22:tescobedo,%20%22password%22:sky2013}
+
+https://geocode-maps.wialon.com/hst-api.wialon.com/gis_geocode?coords=[{"lon":-101.181733,"lat":20.598553}]&uid=879274
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=core/search_items&
+	params={
+	"spec":{
+		"itemsType":"avl_unit",
+		"propName":"sys_name",
+		"propValueMask":"*",
+		"sortType":"sys_name",
+		"propType":"propitemname"},
+	"force":1,
+	"flags":1025,
+	"from":0,
+	"to":0}&sid=24494fb8d01c2aee41bb8d7f8e7393ed
+	
+get messages by unit
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/load_interval&
+	params={
+		"itemId":12014801,
+		"timeFrom":1408557128,
+		"timeTo":1408567128,
+		"flags":0x0000,
+		"flagsMask":0xFF00,
+		"loadCount":0xFFFFFFFF
+	}&sid=e4f3ed78b202f3048130eb5861bcfb4e
+------------------------------------------------------------------------
+documented not working
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/load_interval&
+	params={
+		"itemId":12014801,
+		"type":1,
+		"ival1":1408557128,
+		"ival2":1408567128,
+		"flags":0x0000,
+		"flagsMask":0xFF00,
+		"loadCount":0xFFFFFFFF,
+		"loadLocations":false,
+	}&sid=b1ae000c24e73d5bb2c842d6f66d5cfd
+
+get the number of messages
+	
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/get_messages&
+	params={
+		"indexFrom":8,
+		"indexTo":9
+	}&sid=635f6670c30c9ba3c96de1acc9cf626e
+	
+clear load buffer
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/unload&params={}&sid=635f6670c30c9ba3c96de1acc9cf626e
+
+
+http://162.249.6.228:8080/SkyGuardianControlTower/service/units?userName=tescobedo&password=zxmlOLx22OKp4zEhpHZANA==
+http://localhost:8080/SkyGuardianControlTower/service/units?userName=telematics2013&password=lS5jldclsHH4AFnJhfskRA==
+
+http://162.249.6.228:8080/SkyGuardianControlTower/service/unit/1220354?userName=tescobedo&password=zxmlOLx22OKp4zEhpHZANA==
+http://localhost:8080/SkyGuardianControlTower/service/unit/12014801?userName=tescobedo&password=zxmlOLx22OKp4zEhpHZANA==
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=resource/get_driver_bindings&params={%22resourceId%22:879274,%22unitId%22:0,%22driverId%22:0,%22timeFrom%22:0,%22timeTo%22:1393866600}&sid=283b59f05a29dcc10c8760e0b8f22e9d
+
+
+curl –HAccept:application/json "http://localhost:8080/SkyGuardianControlTower/service/vehicles?userName=tescobedo&password=060f2db2ea8c34bcc73e5ce2f2b47065e81045c2e3a775a5d791103f4c4d27f2d8d5bb62a3e56523"
+
+curl –HAccept:application/xml "http://localhost:8080/SkyGuardianControlTower/service/unit/1220354?userName=tescobedo&password=060f2db2ea8c34bcc73e5ce2f2b47065e81045c2e3a775a5d791103f4c4d27f2d8d5bb62a3e56523"
+
+curl –HAccept:application/xml "http://localhost:8080/SkyGuardianControlTower/service/unit/1220354?userName=tescobedo&password=060f2db2ea8c34bcc73e5ce2f2b47065e81045c2e3a775a5d791103f4c4d27f2d8d5bb62a3e56523"
+
+https://hst-api.wialon.com/wialon/ajax.html?svc=messages/load_interval&params={%22itemId%22:1220354,%22timeFrom%22:1364760000,%22timeTo%22:1393887525,%22flags%22:0x0000,%22flagsMask%22:0xFF00,%22loadCount%22:3}&sid=8ed924cfb1bef97d118918e91145c391
+
+
+http://162.249.6.228:8080/SkyGuardianControlTower/service/vehicles?userName=tescobedo&password=zxmlOLx22OKp4zEhpHZANA==
+
+http://162.249.6.228:8080/SkyGuardianControlTower/service/vehicles?userName=telematics2013&password=lS5jldclsHH4AFnJhfskRA==
+
+FUNCIONA
+http://localhost:8080/SkyGuardianControlTower/service/vehicle/history/12006328?interval=72&loadCount=10&userName=telematics2013&password=8nCMwaQNrShQcalHwc3DTg==
+
+
+
+
+http://198.71.59.110:8080/SkyGuardianControlTower/service/vehicle/history/11489871?interval=72&loadCount=10&userName=telematics2013&password=8nCMwaQNrShQcalHwc3DTg==
+http://162.249.6.228:8080/SkyGuardianControlTower/service/vehicles?userName=telematics2013&password=8nCMwaQNrShQcalHwc3DTg==
+
+
+
+
+
+
+UNIGIS
+
+
+http://200.69.211.179/wsSimon/service.asmx/LoginYInsertarEvento?SystemUser=%22Webtracking%22&Password=%22kurtz%22&Dominio=%22ELI001%22&NroSerie=%22%22&Codigo=%22%22&Latitud=-33.0&Longitud=-58.0&Altitud=0&Velocidad=0&FechaHoraEvento=03-03-2014 21:48:38&FechaHoraRecepcion=03-08-2014 21:48:38
+
+
+
+
+http://localhost:8080/SkyGuardianControlTower-UnitsByInterval/service/units/messages?timeFrom=1409794200&userName=tescobedo&password=xZ9gIeYTQnpIUqSC2zlkxQ==
+
+
+http://skyguardian.us/apps/ejemplo/?baseUrl=https://hst-api.wialon.com&hostUrl=http://by.hosting.wialon.com&lang=en&user=tescobedo&sid=490c20981024aff2e7748b44a4ca9490
+
+
+http://localhost:8080/cttmx-sistema-comercial/service/poi/12011118?userName=serviacero&password=uu8dMGl3DfvDKemyASGcXQ==

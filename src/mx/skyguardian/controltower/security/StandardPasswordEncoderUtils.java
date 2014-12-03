@@ -11,7 +11,6 @@ public class StandardPasswordEncoderUtils {
 	}
 	
 	public static boolean isValidPassword(String rawPassword, String encodedPassword) {
-		log.debug("EncodedPassword:"+encodedPassword);
 		StandardPasswordEncoder encoder = new StandardPasswordEncoder();		
 		
 		try {

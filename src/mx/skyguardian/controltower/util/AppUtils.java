@@ -1,16 +1,20 @@
 package mx.skyguardian.controltower.util;
-import java.util.GregorianCalendar;
+
+import java.util.Calendar;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
-
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.util.PropertyPlaceholderHelper;
+
 public class AppUtils {
 	private static Logger log = Logger.getLogger(AppUtils.class);
 	private static final int MAX_SECOND = 59;
 	private static final int MAX_MINUTE = 59;
 	private static final int MAX_HOUR = 23;
+	
 	private AppUtils(){}
 	
 	public static String getFormattedDate(String format, Long epoch){
@@ -19,7 +23,6 @@ public class AppUtils {
 	}
 	
 	public static String getTimeFrom(Integer timeTo, String interval){
-		
 		Long intervalSec = Long.valueOf(interval) * 3600;
 				
 		return String.valueOf(timeTo-intervalSec);
@@ -36,71 +39,81 @@ public class AppUtils {
 		return h.replacePlaceholders(url, p);
 	}
 	
-	public static Long getFromDatetime(String serverTime){
-		
+	public static Long getTimeFrom(String timeZone){
 		TimeZone defaultTimeZone = TimeZone.getDefault();
+		DateTime fromDate;
+		long posixTime = 0L;
 		
-		GregorianCalendar fromDate;
-		
-		if (!defaultTimeZone.getID().equalsIgnoreCase("America/Mexico_City")){
-			TimeZone mxTimeZone = TimeZone.getTimeZone("America/Mexico_City");
-			fromDate = (GregorianCalendar)GregorianCalendar.getInstance(mxTimeZone);
-					
-			int offSet = mxTimeZone.getOffset(fromDate.getTimeInMillis());
+		if (!defaultTimeZone.getID().equalsIgnoreCase(timeZone)){
+			Calendar datetimeWithTZ = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+ 
+		    int offset = datetimeWithTZ.getTimeZone().getOffset(datetimeWithTZ.getTimeInMillis());
+		    fromDate =  new DateTime(DateTimeZone.UTC );
+			fromDate = fromDate.plus(offset);
+			fromDate = setTo0Hrs(fromDate);
+			fromDate = fromDate.minus(offset);
+			posixTime = fromDate.getMillis();
 			
-			fromDate.add(GregorianCalendar.MILLISECOND, offSet);
-			System.out.println("ForcedTimeZone:"+fromDate.getTime());
 		} else {
-			fromDate = (GregorianCalendar)GregorianCalendar.getInstance();
-			System.out.println("Default:"+fromDate.getTime());
+			fromDate = new DateTime();
+			fromDate = setTo0Hrs(fromDate);
+			posixTime = fromDate.getMillis();
 		}
 		
-		fromDate.add(GregorianCalendar.SECOND, -fromDate.get(GregorianCalendar.SECOND));
-		fromDate.add(GregorianCalendar.MINUTE, -fromDate.get(GregorianCalendar.MINUTE));
-		fromDate.add(GregorianCalendar.HOUR_OF_DAY, -fromDate.get(GregorianCalendar.HOUR_OF_DAY));
-		
-		System.out.println("Final:"+fromDate.getTime());
-		
-		return fromDate.getTimeInMillis()/1000;
-		
+		return posixTime/1000;
 	}
 	
-public static Long getToDatetime(String serverTime){
-		
+	public static Long getTimeTo(String timeZone){
 		TimeZone defaultTimeZone = TimeZone.getDefault();
+		DateTime toDate;
+		long posixTime = 0L;
 		
-		GregorianCalendar baseDate;
-		
-		if (!defaultTimeZone.getID().equalsIgnoreCase("America/Mexico_City")){
-			TimeZone mxTimeZone = TimeZone.getTimeZone("America/Mexico_City");
-			baseDate = (GregorianCalendar)GregorianCalendar.getInstance(mxTimeZone);
-					
-			int offSet = mxTimeZone.getOffset(baseDate.getTimeInMillis());
+		if (!defaultTimeZone.getID().equalsIgnoreCase(timeZone)){
+			Calendar datetimeWithTZ = Calendar.getInstance(TimeZone.getTimeZone(timeZone));
+			 
+		    int offset = datetimeWithTZ.getTimeZone().getOffset(datetimeWithTZ.getTimeInMillis());
+		    toDate =  new DateTime(DateTimeZone.UTC );
+		    toDate = toDate.plus(offset);
+		    toDate = setTo023_59Hrs(toDate);
+		    toDate = toDate.minus(offset);
+			posixTime = toDate.getMillis();
 			
-			baseDate.add(GregorianCalendar.MILLISECOND, offSet);
-			System.out.println("ForcedTimeZone:"+baseDate.getTime());
 		} else {
-			baseDate = (GregorianCalendar)GregorianCalendar.getInstance();
-			System.out.println("Default:"+baseDate.getTime());
+			toDate = new DateTime();
+			toDate = setTo023_59Hrs(toDate);
+			posixTime = toDate.getMillis();
 		}
 		
-		int second = MAX_SECOND-baseDate.get(GregorianCalendar.SECOND);
-		int minute = MAX_MINUTE-baseDate.get(GregorianCalendar.MINUTE);
-		int hour = MAX_HOUR-baseDate.get(GregorianCalendar.HOUR_OF_DAY);
+		return posixTime/1000;
+	}
+	
+	private static DateTime setTo0Hrs(DateTime dateTime) {
+		int sec = dateTime.getSecondOfMinute();
+		int min = dateTime.getMinuteOfHour();
+		int hr = dateTime.getHourOfDay();
+		
+		dateTime=dateTime.minusSeconds(sec);
+		dateTime=dateTime.minusMinutes(min);
+		dateTime=dateTime.minusHours(hr);
+		
+		return dateTime;
+	}	
+	
+	private static DateTime setTo023_59Hrs(DateTime dateTime) {
+		int sec = MAX_SECOND-dateTime.getSecondOfMinute();
+		int min = MAX_MINUTE-dateTime.getMinuteOfHour();
+		int hr = MAX_HOUR-dateTime.getHourOfDay();
 				
-		baseDate.add(GregorianCalendar.SECOND, second);
-		baseDate.add(GregorianCalendar.MINUTE, minute);
-		baseDate.add(GregorianCalendar.HOUR_OF_DAY, hour);
+		dateTime=dateTime.plusSeconds(sec);
+		dateTime=dateTime.plusMinutes(min);
+		dateTime=dateTime.plusHours(hr);
 		
-		System.out.println("Final:"+baseDate.getTime());
-		
-		return baseDate.getTimeInMillis()/1000;
-		
+		return dateTime;
 	}
 	
-	public static void main (String ... args){
 		
-		System.err.println(getToDatetime(String.valueOf(1397580661)));
+	public static void main (String ... args){
+		System.err.println(false);
 	}
 
 }

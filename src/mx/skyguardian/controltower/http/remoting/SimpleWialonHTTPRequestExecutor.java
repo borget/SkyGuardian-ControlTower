@@ -54,8 +54,6 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 			dataCache.close();
 
 			String jsonString = new String(dataCache.toByteArray()).trim();
-			log.debug(jsonString);
-			
 			
 			if (jsonString !=null) {
 				if (jsonString.startsWith("{")) {

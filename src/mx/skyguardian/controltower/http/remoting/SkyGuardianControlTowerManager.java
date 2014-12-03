@@ -3,6 +3,7 @@ package mx.skyguardian.controltower.http.remoting;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -12,6 +13,7 @@ import javax.annotation.Resource;
 import mx.skyguardian.controltower.bean.AbstractWialonEntity;
 import mx.skyguardian.controltower.bean.EmptyUnit;
 import mx.skyguardian.controltower.bean.GeoPosition;
+import mx.skyguardian.controltower.bean.LastMsgReportBase;
 import mx.skyguardian.controltower.bean.Unit;
 import mx.skyguardian.controltower.bean.Units;
 import mx.skyguardian.controltower.bean.Vehicle;
@@ -23,8 +25,11 @@ import mx.skyguardian.controltower.exception.WialonInternalServerError;
 import mx.skyguardian.controltower.json.AbsctractJSONDeserializer;
 import mx.skyguardian.controltower.security.JasyptEncryptor;
 import mx.skyguardian.controltower.util.AppUtils;
+import mx.skyguardian.controltower.util.Constants;
 
 import org.apache.log4j.Logger;
+import org.boon.HTTP;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,7 +45,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	private Properties appProperties;
 	
 	public AbstractWialonEntity getUnit(String userName, String password, String unitId) throws WialonInternalServerError, IOException {
-		log.info("SkyGuardianControlTowerManager.getUnit()="+userName+"::"+password);
 		WialonSession wialonSession = new WialonSession();
 		wialonSession.setUserName(userName);
 		wialonSession.setPassword(JasyptEncryptor.decryptPBEText(password));
@@ -52,8 +56,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		String loginUrl = AppUtils.getURL(
 				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
 		
-		log.debug("SkyGuardianControlTowerManager.getUnit()-loginUrl="+loginUrl);
-				
 		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
 		
 		this.setWialonSession(loginJSONObj, wialonSession);
@@ -61,34 +63,67 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		properties.clear();
 		properties.put("unitId", unitId);
 		properties.put("eid", wialonSession.getEid());
+		properties.put("flags", Constants.FLAGS_0x00100401);
 
 		String unitUrl = AppUtils.getURL(appProperties
-				.getProperty("mx.skyguardian.controltower.searchbyid.url"),
+				.getProperty("mx.skyguardian.controltower.search.unit.url"),
 				properties);
-
-		log.debug("SkyGuardianControlTowerManager.getUnit()-unitUrl=" + unitUrl);
-
+		log.debug("SkyGuardianControlTowerManager.getUnit()-JSON=" + unitUrl);
 		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitUrl);
+		
 		if (!itemObj.isNull("item")) {
 			JSONObject jsonItem = (JSONObject) itemObj.get("item");
 			
 			JSONObject pObj = getPObject(jsonItem);
 			if (pObj != null) {
-				AbstractWialonEntity unit = new Unit();
-				((Unit) unit)
-						.setUnitId(Long.parseLong((jsonItem.isNull("id")) ? "0"
+				Unit unit = new Unit();
+				unit.setUnitId(Long.parseLong((jsonItem.isNull("id")) ? "0"
 								: jsonItem.get("id").toString()));
-				((Unit) unit).setUnitName((jsonItem.isNull("nm")) ? "invalidUnit"
+				unit.setUnitName((jsonItem.isNull("nm")) ? "unknown unit"
 						: jsonItem.get("nm").toString());
-				((Unit) unit).setGeoPosition(jsonDeserializer.getGEOPosition(
+				unit.setGeoPosition(jsonDeserializer.getGEOPosition(
 						jsonItem, wialonSession));
-				((Unit) unit).setLastMsgReport((jsonDeserializer
+				unit.setLastMsgReport((jsonDeserializer
 						.getLastMsgReport(pObj)));
+				
+				AbstractWialonEntity reportBase = unit.getLastMsgReport();
+				((LastMsgReportBase)reportBase).setFuel_level(this.tryToGetFuelSensor(unitId, wialonSession));
+				
 				return unit;
 			}
 		}
 
 		return new EmptyUnit();
+	}
+	
+	private String tryToGetFuelSensor(String unitId, WialonSession wialonSession) {
+		String fuelSensor = null;
+		try {
+			this.loadMessagesByInterval(unitId, wialonSession);
+			String sensorJSON = calculateSensors(unitId, wialonSession, Constants.SENSORS_FUEL_LEVEL);
+			ObjectMapper objMapper = new ObjectMapper();
+			if (sensorJSON != null && sensorJSON.startsWith("[")) {
+				List<Map<Object, Object>> sensorList = objMapper.readValue(sensorJSON, objMapper.getTypeFactory().constructCollectionType(List.class, LinkedHashMap.class));
+
+				for( int i = sensorList.size() -1; i >= 0 ; i --) {
+					Map<Object, Object> sensorItem = sensorList.get(i);
+					String fuelLevelValue = this.tryToGetFuelLevelValue(sensorItem);
+					if (fuelLevelValue != null) {
+						fuelSensor = fuelLevelValue;
+						break;
+					}
+				}
+			} else {
+				@SuppressWarnings("unchecked")
+				Map<Object, Object> sensorObj = objMapper.readValue(sensorJSON,  Map.class);
+				fuelSensor = this.tryToGetFuelLevelValue(sensorObj);
+			}
+			return fuelSensor;
+			
+		} catch(Exception e) {
+			log.error("Exception setting FUEL_SENSOR: "+e.getMessage());
+			return fuelSensor;
+		}
 	}
 	
 	public AbstractWialonEntity getUnits(String userName, String password) throws IOException {
@@ -104,14 +139,13 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		String loginUrl = AppUtils.getURL(
 				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
 		
-		log.debug("SkyGuardianControlTowerManager.getUnits()-loginUrl="+loginUrl);
-		
 		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
 		
 		this.setWialonSession(loginJSONObj, wialonSession);
 		
 		properties.clear();
 		properties.put("sid", wialonSession.getEid());
+		properties.put("flags", Constants.FLAGS_0x00100401);
 
 		String unitsUrl = AppUtils.getURL(appProperties
 				.getProperty("mx.skyguardian.controltower.search.units.url"),
@@ -121,6 +155,8 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 				+ unitsUrl);
 
 		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitsUrl);
+		log.debug("SkyGuardianControlTowerManager.getUnits()-JSON="
+				+ itemObj.toString());
 		//JSONObject itemObj = new JSONObject("{\"searchSpec\":{\"itemsType\":\"avl_unit\",\"propName\":\"sys_name\",\"propValueMask\":\"*\",\"sortType\":\"sys_name\",\"propType\":\"propitemname\"},\"dataFlags\":1025,\"totalItemsCount\":110,\"indexFrom\":0,\"indexTo\":0,\"items\":[{\"nm\":\"60186\",\"cls\":2,\"id\":6527054,\"mu\":0,\"pos\":{\"t\":1415319033,\"y\":18.073986,\"x\":-94.283291,\"z\":0,\"s\":8,\"c\":77,\"sc\":255},\"lmsg\":{\"t\":1415319033,\"f\":7,\"tp\":\"ud\",\"pos\":{\"y\":18.073986,\"x\":-94.283291,\"z\":0,\"s\":8,\"c\":77,\"sc\":255},\"i\":9,\"o\":0,\"p\":{\"gps_tm\":1415319034,\"rtc_tm\":1415319033,\"snd_tm\":1415319055,\"report_id\":251,\"odometer\":71714.9,\"hdop\":0.8,\"adc1\":0,\"temp1\":200,\"temp2\":200,\"dl\":0,\"tw\":0,\"motion\":1,\"ip\":0,\"ps\":0,\"ss\":0,\"ha\":0,\"hb\":0,\"hc\":0,\"jd\":0,\"bl\":0,\"engine\":1,\"pwr_ext\":14,\"rd\":\"251\",\"op\":0,\"in0\":0,\"in1\":0,\"in2\":1,\"od\":\"717149\",\"gsm\":24,\"gsm_status\":9,\"engine_rpm\":1136,\"j1939_speed\":8,\"fuel_cons\":0,\"j1939_fuel_level\":90,\"axle1\":0,\"axle2\":0,\"axle3\":0,\"axle4\":0,\"eng_boost_pressure\":0,\"coolant_temp\":80,\"accel_pos\":19,\"brake_pos\":102,\"pt_air_pressure\":0,\"brake_pressure1\":608,\"brake_pressure2\":600,\"DL\":0,\"TW\":0,\"MT\":1,\"IP\":0,\"PS\":0,\"SS\":0,\"HA\":0,\"HB\":0,\"HC\":0,\"JD\":0,\"BL\":0,\"EG\":1,\"MV\":140,\"RD\":251,\"OP\":0,\"IN0\":0,\"IN1\":0,\"IN2\":1,\"OD\":717149,\"GQ\":24,\"GS\":9}},\"uacl\":281474976710655}]}");	
 		if (!itemObj.isNull("searchSpec")) {
 			JSONArray jsonArray = (JSONArray) itemObj.getJSONArray("items");
@@ -131,17 +167,14 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 					JSONObject jsonItem = (JSONObject) jsonArray.get(i);
 					JSONObject pObj = getPObject(jsonItem);
 					if (pObj != null) {
-						AbstractWialonEntity unit = new Unit();
-						((Unit) unit).setUnitId(Long.parseLong((jsonItem
-								.isNull("id")) ? "0" : jsonItem.get("id")
-								.toString()));
-						((Unit) unit)
-								.setUnitName((jsonItem.isNull("nm")) ? "invalidUnit"
-										: jsonItem.get("nm").toString());
-						((Unit) unit).setGeoPosition(jsonDeserializer
-								.getGEOPosition(jsonItem, wialonSession));
-						((Unit) unit).setLastMsgReport((jsonDeserializer
-								.getLastMsgReport(pObj)));
+						Unit unit = new Unit();
+						unit.setUnitId(Long.parseLong((jsonItem.isNull("id")) ? "0" : jsonItem.get("id").toString()));
+						unit.setUnitName((jsonItem.isNull("nm")) ? "unknown unit" : jsonItem.get("nm").toString());
+						unit.setGeoPosition(jsonDeserializer.getGEOPosition(jsonItem, wialonSession));
+						unit.setLastMsgReport((jsonDeserializer.getLastMsgReport(pObj)));
+						
+						AbstractWialonEntity reportBase = unit.getLastMsgReport();
+						((LastMsgReportBase)reportBase).setFuel_level(null);
 						unitsList.add((Unit) unit);
 					}
 				}
@@ -151,24 +184,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		}
 
 		return new Units();
-	}
-	
-	private JSONObject getPObject (JSONObject jsonItem) {
-		if (jsonItem  != null) {
-			JSONObject lmsgObj = jsonItem.optJSONObject("lmsg");
-			JSONObject pObj = jsonItem.optJSONObject("p");
-			if (lmsgObj != null) {
-				JSONObject pInLmsgObj = lmsgObj.optJSONObject("p");
-				if(!pInLmsgObj.isNull("report_id")){
-					return pInLmsgObj;
-				}
-			} else if (pObj != null) {
-				if (!pObj.isNull("report_id")){
-					return pObj;
-				}
-			}
-		}
-		return null;
 	}
 	
 	@Override
@@ -185,14 +200,13 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		String loginUrl = AppUtils.getURL(
 				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
 		
-		log.debug("SkyGuardianControlTowerManager.getVehicles()-loginUrl="+loginUrl);
-		
 		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
 		
 		this.setWialonSession(loginJSONObj, wialonSession);
 
 		properties.clear();
 		properties.put("sid", wialonSession.getEid());
+		properties.put("flags", Constants.FLAGS_0x00100401);
 
 		String unitsUrl = AppUtils.getURL(appProperties
 				.getProperty("mx.skyguardian.controltower.search.units.url"),
@@ -238,8 +252,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		
 		String loginUrl = AppUtils.getURL(
 				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
-		
-		log.debug("SkyGuardianControlTowerManager.getVehiculeHistory()-loginUrl="+loginUrl);
 		
 		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
 		
@@ -339,4 +351,73 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		}
 	}
 	
+	@Deprecated
+	private String getParameterValueInPrmsObject(JSONObject jsonObj, String param) {
+		JSONObject prmsObj = jsonObj.optJSONObject("prms");
+		JSONObject paramObj= prmsObj.optJSONObject(param);
+		
+		if (paramObj != null) {
+			return paramObj.optString("v", null);
+		}
+		
+		return null;
+	}
+	
+	private JSONObject getPObject (JSONObject jsonItem) {
+		if (jsonItem  != null) {
+			JSONObject lmsgObj = jsonItem.optJSONObject("lmsg");
+			JSONObject pObj = jsonItem.optJSONObject("p");
+			if (lmsgObj != null) {
+				JSONObject pInLmsgObj = lmsgObj.optJSONObject("p");
+				if(!pInLmsgObj.isNull("report_id")){
+					return pInLmsgObj;
+				}
+			} else if (pObj != null) {
+				if (!pObj.isNull("report_id")){
+					return pObj;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private String tryToGetFuelLevelValue(Map<Object, Object> sensorObj) {
+		String fuelLevel = null;
+		try {
+			Double value = sensorObj.get(Constants.SENSORS_FUEL_LEVEL) != null ?
+					Double.valueOf(sensorObj.get(Constants.SENSORS_FUEL_LEVEL).toString()):null;
+			if (value != null && value == Math.abs(value)) {
+				fuelLevel = value.toString();
+			}
+		} catch (Exception e) {
+			log.error("Exception getting FUEL_SENSOR_4: "+e.getMessage());
+		}	
+		return fuelLevel;
+	}
+	
+	private String loadMessagesByInterval (String unitId, WialonSession wialonSession) throws Exception {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("unitId", unitId);
+		properties.put("timeTo", String.valueOf(AppUtils.getTimeTo(appProperties.getProperty("mx.skyguardian.controltower.time.zone.MX"))));
+		properties.put("timeFrom", String.valueOf(AppUtils.getTimeFrom(appProperties.getProperty("mx.skyguardian.controltower.time.zone.MX"))));
+		properties.put("maxIndex",Constants.FLAGS_MAX_INDEX);
+		properties.put("sid", wialonSession.getEid());
+		
+		String loadByIntervalUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.load.messages.by.interval"), properties);
+		log.debug(loadByIntervalUrl);
+		
+		return HTTP.getJSON(loadByIntervalUrl, null);
+	}
+	
+	private String calculateSensors (String unitId, WialonSession wialonSession, String sensorId) throws Exception {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("unitId", unitId);
+		properties.put("maxIndex", Constants.FLAGS_MAX_INDEX);
+		properties.put("sensorId", sensorId);
+		properties.put("sid", wialonSession.getEid());
+		
+		String sensorsUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.calculate.sensors"), properties);
+		log.debug(sensorsUrl);
+		return HTTP.getJSON(sensorsUrl, null);
+	}
 }

@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 The MIT License (MIT)
 
-Copyright (c) 2014 borget
+Copyright (c) 2014 Alberto Vázquez Ramírez
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -209,7 +208,7 @@ Apache License
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
 
-   Copyright {yyyy} {name of copyright owner}
+   Copyright 2014 alberto.vazq.rmz@gmail.com
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -222,5 +221,4 @@ Apache License
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
->>>>>>> a566ef1aba9f941a7aac12bb6985c475f8a331c7
 
