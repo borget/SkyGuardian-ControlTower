@@ -8,6 +8,6 @@ import org.json.JSONObject;
 
 public interface IWialonHTTPRequestExecutor {
 	
-	public JSONObject getHTTPRequest(String urlString) throws WialonInternalServerError, IOException;
-
+	JSONObject getHTTPRequest(String urlString) throws WialonInternalServerError, IOException;
+	AbstractSession doLogin(String userName, String password);
 }

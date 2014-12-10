@@ -13,8 +13,13 @@ import java.util.Properties;
 import javax.annotation.Resource;
 
 import mx.skyguardian.controltower.exception.WialonInternalServerError;
+import mx.skyguardian.controltower.security.JasyptEncryptor;
+import mx.skyguardian.controltower.util.AppUtils;
 
 import org.apache.log4j.Logger;
+import org.boon.HTTP;
+import org.boon.json.JsonFactory;
+import org.boon.json.ObjectMapper;
 import org.json.JSONObject;
 
 public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecutor {
@@ -86,9 +91,26 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 		return jsonObject;
 	}
 	
-	
-
 	public void setAppProperties(Properties appProperties) {
 		this.appProperties = appProperties;
+	}
+	
+	public AbstractSession doLogin(String userName, String password) {
+		AbstractSession wialonSession = null;
+		Map<String, String> properties = new HashMap<String, String>();
+		String decryptedPassword = JasyptEncryptor.decryptPBEText(password);
+		properties.put("user", userName);
+		properties.put("password", decryptedPassword);
+		String loginUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
+		try {
+			ObjectMapper mapper =  JsonFactory.create();
+			wialonSession = mapper.readValue(HTTP.getJSON(loginUrl, null), WialonSession.class);
+			((WialonSession)wialonSession).getUser().setPassword(decryptedPassword);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new WialonInternalServerError();
+		}
+		
+		return wialonSession;
 	}
 }

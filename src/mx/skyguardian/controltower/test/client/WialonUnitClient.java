@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import mx.skyguardian.controltower.bean.AbstractWialonEntity;
 import mx.skyguardian.controltower.bean.GeoPosition;
-import mx.skyguardian.controltower.http.remoting.AbstractUser;
+import mx.skyguardian.controltower.http.remoting.AbstractSession;
 import mx.skyguardian.controltower.http.remoting.IControlTowerManager;
 import mx.skyguardian.controltower.http.remoting.IWialonHTTPRequestExecutor;
 import mx.skyguardian.controltower.http.remoting.SimpleWialonHTTPRequestExecutor;
@@ -102,10 +102,10 @@ public class WialonUnitClient {
 		return httpExec;
 	}
 	
-	private static AbstractUser getUserFromContext() {
+	private static AbstractSession getUserFromContext() {
 		ApplicationContext ctx = new FileSystemXmlApplicationContext(
 				"WebContent/WEB-INF/SkyGuardianControlTower-servlet.xml", "WebContent/WEB-INF/SkyGuardianControlTower-context.xml");
-			AbstractUser ajaxExec = (WialonSession) ctx.getBean("avantUser");
+			AbstractSession ajaxExec = (WialonSession) ctx.getBean("avantUser");
 			return ajaxExec;
 	}
 	

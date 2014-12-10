@@ -22,7 +22,7 @@ public class AppUtils {
 		return date;
 	}
 	
-	public static String getTimeFrom(Integer timeTo, String interval){
+	public static String getTimeFrom(Long timeTo, String interval){
 		Long intervalSec = Long.valueOf(interval) * 3600;
 				
 		return String.valueOf(timeTo-intervalSec);

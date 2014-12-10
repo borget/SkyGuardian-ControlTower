@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+	
+	<aop:aspectj-autoproxy />
 		
 	<!-- <util:properties id="appProperties" location="file:///home/skyguardian/controltower/appProperties.properties"/> -->
 	 <util:properties id="appProperties" location="file:///home/alberto/skyguardian/git-workspace/SkyGuardian-ControlTower/config/appProperties.properties"/>
@@ -17,15 +21,22 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
 		<property name="appProperties" ref = "appProperties"></property>
 	</bean>
 	
+	<bean id="wialonSession" class="mx.skyguardian.controltower.http.remoting.WialonSession"/>
+	
 	<bean id="controlTowerManager" class="mx.skyguardian.controltower.http.remoting.SkyGuardianControlTowerManager">
 		<property name="httpReqExecutor" ref="wialonHTTPExecutor"/>
 		<property name="jsonDeserializer" ref="simpleJsonDeserializer"/>
 		<property name="appProperties" ref = "appProperties"></property>
-		
 	</bean>
-
+	
+	<!-- Aspect
+	<bean id="logAspect" class="mx.skyguardian.controltower.aop.LoggingAspect">
+		<property name="wialonSession" ref = "wialonSession"></property>
+		<property name="appProperties" ref = "appProperties"></property>
+	</bean>  -->
+	
 	<bean id="unitClient" class="mx.skyguardian.controltower.test.client.WialonUnitClient" >
 		<property name="properties" ref = "appProperties"></property>
 	</bean>
-
+	
 </beans>

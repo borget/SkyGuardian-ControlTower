@@ -23,7 +23,6 @@ import mx.skyguardian.controltower.bean.Vehicles;
 import mx.skyguardian.controltower.exception.WialonAccessDeniedException;
 import mx.skyguardian.controltower.exception.WialonInternalServerError;
 import mx.skyguardian.controltower.json.AbsctractJSONDeserializer;
-import mx.skyguardian.controltower.security.JasyptEncryptor;
 import mx.skyguardian.controltower.util.AppUtils;
 import mx.skyguardian.controltower.util.Constants;
 
@@ -36,31 +35,16 @@ import org.json.JSONObject;
 public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	
 	private static Logger log = Logger.getLogger(SkyGuardianControlTowerManager.class);
-	
 	private IWialonHTTPRequestExecutor httpReqExecutor = null;
-	
 	private AbsctractJSONDeserializer jsonDeserializer = null;
 	
 	@Resource(name = "appProperties")
 	private Properties appProperties;
 	
 	public AbstractWialonEntity getUnit(String userName, String password, String unitId) throws WialonInternalServerError, IOException {
-		WialonSession wialonSession = new WialonSession();
-		wialonSession.setUserName(userName);
-		wialonSession.setPassword(JasyptEncryptor.decryptPBEText(password));
+		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("user", wialonSession.getUserName());
-		properties.put("password", wialonSession.getPassword());
-		
-		String loginUrl = AppUtils.getURL(
-				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
-		
-		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
-		
-		this.setWialonSession(loginJSONObj, wialonSession);
-		
-		properties.clear();
 		properties.put("unitId", unitId);
 		properties.put("eid", wialonSession.getEid());
 		properties.put("flags", Constants.FLAGS_0x00100401);
@@ -96,54 +80,10 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		return new EmptyUnit();
 	}
 	
-	private String tryToGetFuelSensor(String unitId, WialonSession wialonSession) {
-		String fuelSensor = null;
-		try {
-			this.loadMessagesByInterval(unitId, wialonSession);
-			String sensorJSON = calculateSensors(unitId, wialonSession, Constants.SENSORS_FUEL_LEVEL);
-			ObjectMapper objMapper = new ObjectMapper();
-			if (sensorJSON != null && sensorJSON.startsWith("[")) {
-				List<Map<Object, Object>> sensorList = objMapper.readValue(sensorJSON, objMapper.getTypeFactory().constructCollectionType(List.class, LinkedHashMap.class));
-
-				for( int i = sensorList.size() -1; i >= 0 ; i --) {
-					Map<Object, Object> sensorItem = sensorList.get(i);
-					String fuelLevelValue = this.tryToGetFuelLevelValue(sensorItem);
-					if (fuelLevelValue != null) {
-						fuelSensor = fuelLevelValue;
-						break;
-					}
-				}
-			} else {
-				@SuppressWarnings("unchecked")
-				Map<Object, Object> sensorObj = objMapper.readValue(sensorJSON,  Map.class);
-				fuelSensor = this.tryToGetFuelLevelValue(sensorObj);
-			}
-			return fuelSensor;
-			
-		} catch(Exception e) {
-			log.error("Exception setting FUEL_SENSOR: "+e.getMessage());
-			return fuelSensor;
-		}
-	}
-	
 	public AbstractWialonEntity getUnits(String userName, String password) throws IOException {
-		
-		WialonSession wialonSession = new WialonSession();
-		wialonSession.setUserName(userName);
-		wialonSession.setPassword(JasyptEncryptor.decryptPBEText(password));
+		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("user", wialonSession.getUserName());
-		properties.put("password", wialonSession.getPassword());
-		
-		String loginUrl = AppUtils.getURL(
-				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
-		
-		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
-		
-		this.setWialonSession(loginJSONObj, wialonSession);
-		
-		properties.clear();
 		properties.put("sid", wialonSession.getEid());
 		properties.put("flags", Constants.FLAGS_0x00100401);
 
@@ -188,23 +128,9 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	
 	@Override
 	public AbstractWialonEntity getVehicles(String userName, String password) throws WialonAccessDeniedException, IOException {
-		
-		WialonSession wialonSession = new WialonSession();
-		wialonSession.setUserName(userName);
-		wialonSession.setPassword(JasyptEncryptor.decryptPBEText(password));
+		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("user", wialonSession.getUserName());
-		properties.put("password", wialonSession.getPassword());
-		
-		String loginUrl = AppUtils.getURL(
-				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
-		
-		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
-		
-		this.setWialonSession(loginJSONObj, wialonSession);
-
-		properties.clear();
 		properties.put("sid", wialonSession.getEid());
 		properties.put("flags", Constants.FLAGS_0x00100401);
 
@@ -242,24 +168,10 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	}
 	
 	public AbstractWialonEntity getVehiculeHistory(String vehicleId,String interval, String loadCount, String userName, String password) throws WialonAccessDeniedException, IOException {
-		WialonSession wialonSession = new WialonSession();
-		wialonSession.setUserName(userName);
-		wialonSession.setPassword(JasyptEncryptor.decryptPBEText(password));
+		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
 		
 		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("user", wialonSession.getUserName());
-		properties.put("password", wialonSession.getPassword());
-		
-		String loginUrl = AppUtils.getURL(
-				appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
-		
-		JSONObject loginJSONObj = httpReqExecutor.getHTTPRequest(loginUrl);
-		
-		this.setWialonSession(loginJSONObj, wialonSession);
-
-		properties.clear();
-
-		Integer serverTime = wialonSession.getServerTime();
+		Long serverTime = wialonSession.getTm();
 		String timeFrom = AppUtils.getTimeFrom(serverTime, interval);
 
 		properties.put("vehiculeId", vehicleId);
@@ -336,32 +248,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	public void setAppProperties(Properties appProperties) {
 		this.appProperties = appProperties;
 	}
-
-	private void setWialonSession(JSONObject loginObj, WialonSession wialonSessionObj){
-		JSONObject userObj = loginObj.optJSONObject("user");
-		Object eid = loginObj.opt("eid");
-		Object tm = loginObj.get("tm");
-		
-		if ((userObj != null && userObj.opt("id") != null) && eid != null && tm != null) {
-			wialonSessionObj.setUserId(userObj.opt("id").toString());
-			wialonSessionObj.setEid(loginObj.get("eid").toString());
-			wialonSessionObj.setServerTime(Integer.valueOf(loginObj.get("tm").toString()));
-		} else {
-			throw new WialonInternalServerError();
-		}
-	}
-	
-	@Deprecated
-	private String getParameterValueInPrmsObject(JSONObject jsonObj, String param) {
-		JSONObject prmsObj = jsonObj.optJSONObject("prms");
-		JSONObject paramObj= prmsObj.optJSONObject(param);
-		
-		if (paramObj != null) {
-			return paramObj.optString("v", null);
-		}
-		
-		return null;
-	}
 	
 	private JSONObject getPObject (JSONObject jsonItem) {
 		if (jsonItem  != null) {
@@ -395,7 +281,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		return fuelLevel;
 	}
 	
-	private String loadMessagesByInterval (String unitId, WialonSession wialonSession) throws Exception {
+	private String loadMessagesByInterval (String unitId, AbstractSession wialonSession) throws Exception {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("unitId", unitId);
 		properties.put("timeTo", String.valueOf(AppUtils.getTimeTo(appProperties.getProperty("mx.skyguardian.controltower.time.zone.MX"))));
@@ -409,7 +295,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		return HTTP.getJSON(loadByIntervalUrl, null);
 	}
 	
-	private String calculateSensors (String unitId, WialonSession wialonSession, String sensorId) throws Exception {
+	private String calculateSensors (String unitId, AbstractSession wialonSession, String sensorId) throws Exception {
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("unitId", unitId);
 		properties.put("maxIndex", Constants.FLAGS_MAX_INDEX);
@@ -419,5 +305,35 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		String sensorsUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.calculate.sensors"), properties);
 		log.debug(sensorsUrl);
 		return HTTP.getJSON(sensorsUrl, null);
+	}
+	
+	private String tryToGetFuelSensor(String unitId, AbstractSession wialonSession) {
+		String fuelSensor = null;
+		try {
+			this.loadMessagesByInterval(unitId, wialonSession);
+			String sensorJSON = calculateSensors(unitId, wialonSession, Constants.SENSORS_FUEL_LEVEL);
+			ObjectMapper objMapper = new ObjectMapper();
+			if (sensorJSON != null && sensorJSON.startsWith("[")) {
+				List<Map<Object, Object>> sensorList = objMapper.readValue(sensorJSON, objMapper.getTypeFactory().constructCollectionType(List.class, LinkedHashMap.class));
+
+				for( int i = sensorList.size() -1; i >= 0 ; i --) {
+					Map<Object, Object> sensorItem = sensorList.get(i);
+					String fuelLevelValue = this.tryToGetFuelLevelValue(sensorItem);
+					if (fuelLevelValue != null) {
+						fuelSensor = fuelLevelValue;
+						break;
+					}
+				}
+			} else {
+				@SuppressWarnings("unchecked")
+				Map<Object, Object> sensorObj = objMapper.readValue(sensorJSON,  Map.class);
+				fuelSensor = this.tryToGetFuelLevelValue(sensorObj);
+			}
+			return fuelSensor;
+			
+		} catch(Exception e) {
+			log.error("Exception setting FUEL_SENSOR: "+e.getMessage());
+			return fuelSensor;
+		}
 	}
 }

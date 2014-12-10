@@ -15,8 +15,9 @@ import mx.skyguardian.controltower.bean.LastMsgReport251;
 import mx.skyguardian.controltower.bean.LastMsgReport252;
 import mx.skyguardian.controltower.bean.LastMsgReport253;
 import mx.skyguardian.controltower.bean.LastMsgReport254;
-import mx.skyguardian.controltower.http.remoting.AbstractUser;
+import mx.skyguardian.controltower.http.remoting.AbstractSession;
 import mx.skyguardian.controltower.http.remoting.IWialonHTTPRequestExecutor;
+import mx.skyguardian.controltower.http.remoting.WialonSession;
 import mx.skyguardian.controltower.util.AppUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +34,7 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 	private static Logger log = Logger.getLogger(SimpleJSONDeserializer.class);
 
 	@Override
-	public AbstractWialonEntity getGEOPosition(JSONObject jsonObj, AbstractUser user) throws JSONException {
+	public AbstractWialonEntity getGEOPosition(JSONObject jsonObj, AbstractSession user) throws JSONException {
 		AbstractWialonEntity geoPosition = null;
 		
 		if (jsonObj != null) {
@@ -56,7 +57,7 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 					Map<String, String> properties = new HashMap<String, String>();
 					properties.put("longitud", (((GeoPosition) geoPosition).getLongitud()).toString());
 					properties.put("latitud", (((GeoPosition) geoPosition).getLatitud()).toString());
-					properties.put("userId", user.getUserId());
+					properties.put("userId", ((WialonSession)user).getUser().getId());
 
 					
 					String geoPosUrl = AppUtils.getURL(
