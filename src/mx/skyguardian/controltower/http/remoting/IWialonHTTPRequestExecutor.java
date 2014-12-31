@@ -10,4 +10,5 @@ public interface IWialonHTTPRequestExecutor {
 	
 	JSONObject getHTTPRequest(String urlString) throws WialonInternalServerError, IOException;
 	AbstractSession doLogin(String userName, String password);
+	String getAddressByCoordinates(String longitud, String latitud, String userId);
 }

@@ -1,8 +1,5 @@
 package mx.skyguardian.controltower.json;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -10,11 +7,11 @@ import javax.annotation.Resource;
 import mx.skyguardian.controltower.bean.AbstractWialonEntity;
 import mx.skyguardian.controltower.bean.GeoPosition;
 import mx.skyguardian.controltower.bean.LastMsgReport0;
-import mx.skyguardian.controltower.bean.LastMsgReportBase;
 import mx.skyguardian.controltower.bean.LastMsgReport251;
 import mx.skyguardian.controltower.bean.LastMsgReport252;
 import mx.skyguardian.controltower.bean.LastMsgReport253;
 import mx.skyguardian.controltower.bean.LastMsgReport254;
+import mx.skyguardian.controltower.bean.LastMsgReportBase;
 import mx.skyguardian.controltower.http.remoting.AbstractSession;
 import mx.skyguardian.controltower.http.remoting.IWialonHTTPRequestExecutor;
 import mx.skyguardian.controltower.http.remoting.WialonSession;
@@ -48,37 +45,13 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 						Integer.parseInt((geoPos.isNull("s"))?"0":geoPos.get("s").toString()),
 						Integer.parseInt((geoPos.isNull("c"))?"0":geoPos.get("c").toString()),
 						Integer.parseInt((geoPos.isNull("sc"))?"0":geoPos.get("sc").toString()));
-				
 				((GeoPosition)geoPosition).setDateTime(AppUtils.getFormattedDate(appProperties.getProperty(
 						"mx.skyguardian.controltower.geoposition.datetime.format"),((GeoPosition)geoPosition).getTimeUTC()));
-				
-				try {
-					
-					Map<String, String> properties = new HashMap<String, String>();
-					properties.put("longitud", (((GeoPosition) geoPosition).getLongitud()).toString());
-					properties.put("latitud", (((GeoPosition) geoPosition).getLatitud()).toString());
-					properties.put("userId", ((WialonSession)user).getUser().getId());
-
-					
-					String geoPosUrl = AppUtils.getURL(
-							appProperties.getProperty("mx.skyguardian.controltower.address.by.coordinates"), properties);
-					
-					JSONObject geoPosDesc = httpReqExecutor.getHTTPRequest(geoPosUrl);
-			
-					if(geoPosDesc.length()!=0){
-						if (!geoPosDesc.isNull("jsonArray") && geoPosDesc.get("jsonArray").toString().length() > 4){
-							String geoPosStr = geoPosDesc.get("jsonArray").toString();
-							geoPosStr = geoPosStr.substring(2, geoPosStr.length()-2);
-							byte[] latin1 = geoPosStr.getBytes("ISO-8859-1");
-							((GeoPosition)geoPosition).setPositionDesc(new String (latin1, "UTF-8"));
-							((GeoPosition)geoPosition).setPositionDesc(geoPosStr);
-						}
-					}
-
-				} catch (IOException e) {
-					log.error("There was an error retriving the Geo Position Description.");
-					e.printStackTrace();
-				} 
+				String geoPosDescription = this.httpReqExecutor.getAddressByCoordinates(
+												(((GeoPosition) geoPosition).getLongitud()).toString(),
+										        (((GeoPosition) geoPosition).getLatitud()).toString(),
+						                         ((WialonSession)user).getUser().getId());
+				((GeoPosition)geoPosition).setPositionDesc(geoPosDescription);
 				return geoPosition;
 			}
 			
@@ -145,7 +118,7 @@ public class SimpleJSONDeserializer extends AbsctractJSONDeserializer {
 	}
 	
 	private void setReport2(AbstractWialonEntity report, JSONObject jsonReport) {
-		((LastMsgReportBase) report).setReportId((jsonReport.isNull("report_id"))? StringUtils.EMPTY :jsonReport.get("report_id").toString());			
+		((LastMsgReportBase) report).setReport_id((jsonReport.isNull("report_id"))? StringUtils.EMPTY :jsonReport.get("report_id").toString());			
 		((LastMsgReportBase) report).setOdometer((jsonReport.isNull("odometer"))? StringUtils.EMPTY :jsonReport.get("odometer").toString());				
 		((LastMsgReportBase) report).setHdop((jsonReport.isNull("hdop"))? StringUtils.EMPTY :jsonReport.get("hdop").toString());			   
 		((LastMsgReportBase) report).setAdc1((jsonReport.isNull("adc1"))? StringUtils.EMPTY :jsonReport.get("adc1").toString());			   

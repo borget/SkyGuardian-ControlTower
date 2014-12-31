@@ -39,23 +39,18 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
 			connection.setRequestMethod("GET");
-			connection.setRequestProperty("Content-Type",
-					"application/json; charset=utf-8");
-
-			//connection.setDoOutput(true);
+			connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
 			inputStream = new BufferedInputStream(connection.getInputStream());
 
 			ByteArrayOutputStream dataCache = new ByteArrayOutputStream();
 
-			// Fully read data
 			byte[] buff = new byte[1024];
 			int len;
 			while ((len = inputStream.read(buff)) >= 0) {
 				dataCache.write(buff, 0, len);
 			}
 
-			// Close streams
 			dataCache.close();
 
 			String jsonString = new String(dataCache.toByteArray()).trim();
@@ -63,31 +58,22 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 			if (jsonString !=null) {
 				if (jsonString.startsWith("{")) {
 					jsonObject = new JSONObject(jsonString);
-					
 					boolean error = !jsonObject.isNull("error");
-					
-
 					if (error) {
 						log.error(jsonObject.get("error:"+jsonObject.toString()));
 						throw new WialonInternalServerError();
 					} 
-
 				} else if (jsonString.startsWith("[")) {
 					Map<String, String > content = new HashMap<String, String>();
 					content.put("jsonArray", jsonString);
 					jsonObject = new JSONObject(content);
 				}
-				
-			}
-			
-				
+			}		
 		} finally {
 			if (null != inputStream) {
 				inputStream.close();
 			}
 		}
-		
-		
 		return jsonObject;
 	}
 	
@@ -112,5 +98,25 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 		}
 		
 		return wialonSession;
+	}
+	
+	public String getAddressByCoordinates(String longitud, String latitud, String userId) {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("longitud", longitud);
+		properties.put("latitud", latitud);
+		properties.put("userId", userId);
+		String geoPosUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.address.by.coordinates"), properties);
+		try {
+			String geoPosDesc = HTTP.getJSON(geoPosUrl, null);
+			if(geoPosDesc != null && 
+				!geoPosDesc.isEmpty() && 
+				geoPosDesc.startsWith("[\"") &&
+				geoPosDesc.endsWith("\"]")){
+				return geoPosDesc.substring(2, geoPosDesc.length()-2);
+			}
+		} catch (Exception e) {
+			log.error("Error getting Address by coordinates:"+e.getMessage());
+		}
+		return new String("Address not available.");
 	}
 }

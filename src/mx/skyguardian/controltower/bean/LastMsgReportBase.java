@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="lastMsgReport")
 public class LastMsgReportBase extends AbstractWialonEntity {
 
-	private String reportId = null;
+	private String report_id = null;
 	private String odometer = null;
 	private String hdop = null;
 	private String adc1 = null;
@@ -57,7 +57,7 @@ public class LastMsgReportBase extends AbstractWialonEntity {
 		
 	}
 	
-	public LastMsgReportBase(String reportId, String odometer, String hdop,
+	public LastMsgReportBase(String report_id, String odometer, String hdop,
 			String adc1, String temp1, String temp2, String dl, String tw,
 			String mT, String ip, String ps, String ss, String ha,
 			String hb, String hc, String jd, String bl, String eG,
@@ -68,7 +68,7 @@ public class LastMsgReportBase extends AbstractWialonEntity {
 			String j1708_odo, String j1708_speed, String j1708_fuel_level,
 			String op0, String op1, String op2, String op3, String avl_driver) {
 		super();
-		this.reportId = reportId;
+		this.report_id = report_id;
 		this.odometer = odometer;
 		this.hdop = hdop;
 		this.adc1 = adc1;
@@ -115,12 +115,7 @@ public class LastMsgReportBase extends AbstractWialonEntity {
 		this.op3 = op3;
 		this.avl_driver = avl_driver;
 	}
-	public String getReportId() {
-		return reportId;
-	}
-	public void setReportId(String reportId) {
-		this.reportId = reportId;
-	}
+
 	public String getOdometer() {
 		return odometer;
 	}
@@ -390,5 +385,13 @@ public class LastMsgReportBase extends AbstractWialonEntity {
 	}
 	public void setAvl_driver(String avl_driver) {
 		this.avl_driver = avl_driver;
+	}
+
+	public String getReport_id() {
+		return report_id;
+	}
+
+	public void setReport_id(String report_id) {
+		this.report_id = report_id;
 	}
 }

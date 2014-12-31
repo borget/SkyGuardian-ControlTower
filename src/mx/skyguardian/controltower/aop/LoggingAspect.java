@@ -38,8 +38,8 @@ public class LoggingAspect {
 		properties.put("password", decryptedPassword);
 		String loginUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.login.url"), properties);
 		ObjectMapper mapper =  JsonFactory.create();
-		this.wialonSession = mapper.readValue(HTTP.getJSON(loginUrl, null), WialonSession.class);
-		((WialonSession)this.wialonSession).getUser().setPassword(decryptedPassword);
+//		this.wialonSession = mapper.readValue(HTTP.getJSON(loginUrl, null), WialonSession.class);
+//		((WialonSession)this.wialonSession).getUser().setPassword(decryptedPassword);
 	}
 	
 	public AbstractSession getWialonSession() {

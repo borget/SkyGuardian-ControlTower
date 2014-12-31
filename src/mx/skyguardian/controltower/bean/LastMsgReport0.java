@@ -1,6 +1,6 @@
 package mx.skyguardian.controltower.bean;
 
-public class LastMsgReport0 extends AbstractWialonEntity {
+public class LastMsgReport0 extends LastMsgReportBase {
 	private String report_id = null;
 	private String gps_acc = null;
 	private String packet_type = null;

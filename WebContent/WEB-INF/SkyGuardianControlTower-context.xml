@@ -21,12 +21,13 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
 		<property name="appProperties" ref = "appProperties"></property>
 	</bean>
 	
-	<bean id="wialonSession" class="mx.skyguardian.controltower.http.remoting.WialonSession"/>
+	<bean id="helper" class="mx.skyguardian.controltower.http.remoting.SkyGuardianControlTowerManagerHelper"/>
 	
 	<bean id="controlTowerManager" class="mx.skyguardian.controltower.http.remoting.SkyGuardianControlTowerManager">
 		<property name="httpReqExecutor" ref="wialonHTTPExecutor"/>
 		<property name="jsonDeserializer" ref="simpleJsonDeserializer"/>
 		<property name="appProperties" ref = "appProperties"></property>
+		<property name="helper" ref = "helper"></property>
 	</bean>
 	
 	<!-- Aspect

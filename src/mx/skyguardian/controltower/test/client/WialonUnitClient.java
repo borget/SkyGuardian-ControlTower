@@ -102,12 +102,12 @@ public class WialonUnitClient {
 		return httpExec;
 	}
 	
-	private static AbstractSession getUserFromContext() {
-		ApplicationContext ctx = new FileSystemXmlApplicationContext(
-				"WebContent/WEB-INF/SkyGuardianControlTower-servlet.xml", "WebContent/WEB-INF/SkyGuardianControlTower-context.xml");
-			AbstractSession ajaxExec = (WialonSession) ctx.getBean("avantUser");
-			return ajaxExec;
-	}
+//	private static AbstractSession getUserFromContext() {
+//		ApplicationContext ctx = new FileSystemXmlApplicationContext(
+//				"WebContent/WEB-INF/SkyGuardianControlTower-servlet.xml", "WebContent/WEB-INF/SkyGuardianControlTower-context.xml");
+//			AbstractSession ajaxExec = (WialonSession) ctx.getBean("avantUser");
+//			return ajaxExec;
+//	}
 	
 	private static IControlTowerManager getControlTowerManagerFromContext() {
 		ApplicationContext ctx = new FileSystemXmlApplicationContext(
