@@ -23,11 +23,25 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
 	
 	<bean id="helper" class="mx.skyguardian.controltower.http.remoting.SkyGuardianControlTowerManagerHelper"/>
 	
+	<!-- USER CONFIGURATION -->
+	<bean id="tescoUser" class="mx.skyguardian.controltower.bean.User">
+		<property name="id" value="879274" />
+		<property name="token" value="4ee2dd76b63ee84712679c487a1c5f3f4B4469356ED184977230D10E5BFDB6B8A417839B" />
+		<property name="user" value="tescobedo" />
+		<property name="password" value="sky2013" />
+	</bean>
+	
+	<util:map id="users" value-type="mx.skyguardian.controltower.bean.User">
+      <entry key="tescobedo" value-ref="tescoUser" />     
+   </util:map>
+	<!-- END USER CONFIGURATION -->
+	
 	<bean id="controlTowerManager" class="mx.skyguardian.controltower.http.remoting.SkyGuardianControlTowerManager">
 		<property name="httpReqExecutor" ref="wialonHTTPExecutor"/>
 		<property name="jsonDeserializer" ref="simpleJsonDeserializer"/>
 		<property name="appProperties" ref = "appProperties"></property>
 		<property name="helper" ref = "helper"></property>
+		<property name="users" ref = "users"></property>
 	</bean>
 	
 	<!-- Aspect

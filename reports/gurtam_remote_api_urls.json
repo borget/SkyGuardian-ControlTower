@@ -1,6 +1,7 @@
 #gS5zzasfw
 
 centos
+http://apps.cttmx.com/unigis_logs/
 unigis_root
 RC@#09
 
@@ -44,9 +45,17 @@ http://localhost:8080/SkyGuardianControlTower/service/unit/12011118?userName=ser
 
 
 https://hst-api.wialon.com/wialon/ajax.html?svc=core/login&params=%7B%22user%22:%22tescobedo%22,%22password%22:%22sky2013%22%7D
-https://hst-api.wialon.com/wialon/ajax.html?svc=core/search_item&params={%22id%22:1220354,%22flags%22:1025}&sid=f78ff5a47a53ef0b3d83c2be160112b9
+https://hst-api.wialon.com/wialon/ajax.html?svc=core/search_item&params={%22id%22:1220354,%22flags%22:1025}&sid=643e3ed7c4bcdb0fd65705db143c868c
 http://198.71.59.110:8080/SkyGuardianControlTower/service/unit/1220354?userName=tescobedo
 
+OAuth
+Get Tokens
+1. http://hosting.wialon.com/login.html?client_id=skyguardian-token&access_type=-1&activation_time=0&d
+uration=300&lang=en&flags=0x1&user=tescobedo&pass=sky2013,
+2. https://hst-api.wialon.com/wialon/ajax.html?svc=token/login&params={%22token%22:%224ee2dd76b63ee84712679c487a1c5f3fB1C4EBA503C04EDC7986313D04DE566164EECFBA%22,%22operateAs%22:%22%22}
+3. https://hst-api.wialon.com/wialon/ajax.html?svc=token/list&params={"userId":"879274"}&sid=<your_sid>
+Delete Tokens
+https://hst-api.wialon.com/wialon/ajax.html?svc=token/update&params={%22callMode%22:delete,%22userId%22:%22879274%22,%22h%22:%224ee2dd76b63ee84712679c487a1c5f3fE8E21F68E1E8326F0AAF97FA3735C03347A2D643%22,%22app%22:%22skyguardian-token%22,%22deleteAll%22:%22true%22}
 
 https://hst-api.wialon.com/gis_geocode?coords=[%7B%22lon%22:-100.440833,%22lat%22:20.630471%7D]&flags=1255211008&uid=60120&params={%22user%22:tescobedo,%20%22password%22:sky2013}
 
@@ -63,7 +72,7 @@ https://hst-api.wialon.com/wialon/ajax.html?svc=core/search_items&
 	"force":1,
 	"flags":1025,
 	"from":0,
-	"to":0}&sid=24494fb8d01c2aee41bb8d7f8e7393ed
+	"to":0}&sid=643e3ed7c4bcdb0fd65705db143c868c
 	
 get messages by unit
 https://hst-api.wialon.com/wialon/ajax.html?svc=messages/load_interval&

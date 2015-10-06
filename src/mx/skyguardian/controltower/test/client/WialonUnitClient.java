@@ -51,8 +51,8 @@ public class WialonUnitClient {
 		
 		//JSONObject geoPosDescObj = new JSONObject(geoPosDesc);
 		//Object obj = JSONObject.wrap(geoPosDesc);
-		IControlTowerManager CTManager = getControlTowerManagerFromContext();
-		AbstractWialonEntity units = CTManager.getUnits("tescobedo", "zxmlOLx22OKp4zEhpHZANA==");
+		//IControlTowerManager CTManager = getControlTowerManagerFromContext();
+		//AbstractWialonEntity units = CTManager.getUnits("tescobedo", "zxmlOLx22OKp4zEhpHZANA==");
 		
 		//CTManager.getUnit("tescobedo","060f2db2ea8c34bcc73e5ce2f2b47065e81045c2e3a775a5d791103f4c4d27f2d8d5bb62a3e56523", "879279", "1025");
 		

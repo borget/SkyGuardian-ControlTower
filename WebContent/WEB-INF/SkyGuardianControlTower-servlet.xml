@@ -60,6 +60,7 @@
 				<value>mx.skyguardian.controltower.bean.LastMsgReport253</value>
 				<value>mx.skyguardian.controltower.bean.LastMsgReport254</value>
 				<value>mx.skyguardian.controltower.bean.Encryptor</value>
+				<value>mx.skyguardian.controltower.bean.User</value>
 			</list>
 		</property>
 	</bean>

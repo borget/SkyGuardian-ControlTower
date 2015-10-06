@@ -18,6 +18,7 @@ import mx.skyguardian.controltower.bean.LastMsgReport252;
 import mx.skyguardian.controltower.bean.LastMsgReport253;
 import mx.skyguardian.controltower.bean.LastMsgReport254;
 import mx.skyguardian.controltower.bean.LastMsgReportBase;
+import mx.skyguardian.controltower.bean.User;
 import mx.skyguardian.controltower.bean.Unit;
 import mx.skyguardian.controltower.bean.Units;
 import mx.skyguardian.controltower.bean.Vehicle;
@@ -46,9 +47,12 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	@Resource(name = "appProperties")
 	private Properties appProperties;
 	
+	@Resource(name = "users")
+	private Map<String, User> users;
+
 	public AbstractWialonEntity getUnit(String userName, String password, String unitId) throws WialonInternalServerError, IOException {
-		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
-		
+		User user = users.get(userName);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("unitId", unitId);
 		properties.put("eid", wialonSession.getEid());
@@ -57,7 +61,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		String unitUrl = AppUtils.getURL(appProperties
 				.getProperty("mx.skyguardian.controltower.search.unit.url"),
 				properties);
-		log.debug("SkyGuardianControlTowerManager.getUnit()-JSON=" + unitUrl);
+		//log.debug("SkyGuardianControlTowerManager.getUnit()-JSON=" + unitUrl);
 		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitUrl);
 		
 		Unit unit = new Unit();
@@ -131,7 +135,8 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	}
 	
 	public AbstractWialonEntity getUnits(String userName, String password) throws IOException {
-		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
+		User user = users.get(userName);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("sid", wialonSession.getEid());
@@ -145,8 +150,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 				+ unitsUrl);
 
 		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitsUrl);
-		log.debug("SkyGuardianControlTowerManager.getUnits()-JSON="
-				+ itemObj.toString());
+		//log.debug("SkyGuardianControlTowerManager.getUnits()-JSON=" + itemObj.toString());
 		//JSONObject itemObj = new JSONObject("{\"searchSpec\":{\"itemsType\":\"avl_unit\",\"propName\":\"sys_name\",\"propValueMask\":\"*\",\"sortType\":\"sys_name\",\"propType\":\"propitemname\"},\"dataFlags\":1025,\"totalItemsCount\":110,\"indexFrom\":0,\"indexTo\":0,\"items\":[{\"nm\":\"60186\",\"cls\":2,\"id\":6527054,\"mu\":0,\"pos\":{\"t\":1415319033,\"y\":18.073986,\"x\":-94.283291,\"z\":0,\"s\":8,\"c\":77,\"sc\":255},\"lmsg\":{\"t\":1415319033,\"f\":7,\"tp\":\"ud\",\"pos\":{\"y\":18.073986,\"x\":-94.283291,\"z\":0,\"s\":8,\"c\":77,\"sc\":255},\"i\":9,\"o\":0,\"p\":{\"gps_tm\":1415319034,\"rtc_tm\":1415319033,\"snd_tm\":1415319055,\"report_id\":251,\"odometer\":71714.9,\"hdop\":0.8,\"adc1\":0,\"temp1\":200,\"temp2\":200,\"dl\":0,\"tw\":0,\"motion\":1,\"ip\":0,\"ps\":0,\"ss\":0,\"ha\":0,\"hb\":0,\"hc\":0,\"jd\":0,\"bl\":0,\"engine\":1,\"pwr_ext\":14,\"rd\":\"251\",\"op\":0,\"in0\":0,\"in1\":0,\"in2\":1,\"od\":\"717149\",\"gsm\":24,\"gsm_status\":9,\"engine_rpm\":1136,\"j1939_speed\":8,\"fuel_cons\":0,\"j1939_fuel_level\":90,\"axle1\":0,\"axle2\":0,\"axle3\":0,\"axle4\":0,\"eng_boost_pressure\":0,\"coolant_temp\":80,\"accel_pos\":19,\"brake_pos\":102,\"pt_air_pressure\":0,\"brake_pressure1\":608,\"brake_pressure2\":600,\"DL\":0,\"TW\":0,\"MT\":1,\"IP\":0,\"PS\":0,\"SS\":0,\"HA\":0,\"HB\":0,\"HC\":0,\"JD\":0,\"BL\":0,\"EG\":1,\"MV\":140,\"RD\":251,\"OP\":0,\"IN0\":0,\"IN1\":0,\"IN2\":1,\"OD\":717149,\"GQ\":24,\"GS\":9}},\"uacl\":281474976710655}]}");	
 		if (!itemObj.isNull("searchSpec")) {
 			JSONArray jsonArray = (JSONArray) itemObj.getJSONArray("items");
@@ -176,7 +180,8 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	
 	@Override
 	public AbstractWialonEntity getVehicles(String userName, String password) throws WialonAccessDeniedException, IOException {
-		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
+		User user = users.get(userName);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("sid", wialonSession.getEid());
@@ -186,8 +191,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 				.getProperty("mx.skyguardian.controltower.search.units.url"),
 				properties);
 
-		log.debug("SkyGuardianControlTowerManager.getVehicles()-unitsUrl="
-				+ unitsUrl);
+		//log.debug("SkyGuardianControlTowerManager.getVehicles()-unitsUrl=" + unitsUrl);
 
 		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitsUrl);
 
@@ -216,7 +220,8 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	}
 	
 	public AbstractWialonEntity getVehiculeHistory(String vehicleId,String interval, String loadCount, String userName, String password) throws WialonAccessDeniedException, IOException {
-		AbstractSession wialonSession = this.httpReqExecutor.doLogin(userName, password);
+		User user = users.get(userName);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		Long serverTime = wialonSession.getTm();
@@ -283,18 +288,6 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		}
 
 		return new VehicleHistory();
-	}
-	
-	public void setHttpReqExecutor(IWialonHTTPRequestExecutor httpReqExecutor) {
-		this.httpReqExecutor = httpReqExecutor;
-	}
-
-	public void setJsonDeserializer(AbsctractJSONDeserializer jsonDeserializer) {
-		this.jsonDeserializer = jsonDeserializer;
-	}
-
-	public void setAppProperties(Properties appProperties) {
-		this.appProperties = appProperties;
 	}
 	
 	private JSONObject getPObject (JSONObject jsonItem) {
@@ -392,5 +385,21 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 
 	public void setHelper(SkyGuardianControlTowerManagerHelper helper) {
 		this.helper = helper;
+	}
+	
+	public void setHttpReqExecutor(IWialonHTTPRequestExecutor httpReqExecutor) {
+		this.httpReqExecutor = httpReqExecutor;
+	}
+
+	public void setJsonDeserializer(AbsctractJSONDeserializer jsonDeserializer) {
+		this.jsonDeserializer = jsonDeserializer;
+	}
+
+	public void setAppProperties(Properties appProperties) {
+		this.appProperties = appProperties;
+	}
+	
+	public void setUsers(Map<String, User> users) {
+		this.users = users;
 	}
 }

@@ -5,7 +5,7 @@ import java.io.IOException;
 import mx.skyguardian.controltower.bean.AbstractWialonEntity;
 import mx.skyguardian.controltower.bean.EmptyUnit;
 import mx.skyguardian.controltower.bean.Encryptor;
-import mx.skyguardian.controltower.bean.Unit;
+import mx.skyguardian.controltower.bean.User;
 import mx.skyguardian.controltower.bean.Units;
 import mx.skyguardian.controltower.bean.VehicleHistory;
 import mx.skyguardian.controltower.bean.Vehicles;

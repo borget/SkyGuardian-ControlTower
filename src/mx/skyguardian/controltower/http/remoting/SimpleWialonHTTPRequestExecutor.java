@@ -12,6 +12,8 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import mx.skyguardian.controltower.bean.User;
+import mx.skyguardian.controltower.exception.WialonAccessDeniedException;
 import mx.skyguardian.controltower.exception.WialonInternalServerError;
 import mx.skyguardian.controltower.security.JasyptEncryptor;
 import mx.skyguardian.controltower.util.AppUtils;
@@ -81,6 +83,7 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 		this.appProperties = appProperties;
 	}
 	
+	@Deprecated
 	public AbstractSession doLogin(String userName, String password) {
 		AbstractSession wialonSession = null;
 		Map<String, String> properties = new HashMap<String, String>();
@@ -92,6 +95,29 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 			ObjectMapper mapper =  JsonFactory.create();
 			wialonSession = mapper.readValue(HTTP.getJSON(loginUrl, null), WialonSession.class);
 			((WialonSession)wialonSession).getUser().setPassword(decryptedPassword);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new WialonInternalServerError();
+		}
+		
+		return wialonSession;
+	}
+	
+
+	@Override
+	public AbstractSession oAuthLogin(String userName, String password, User user) {
+		String decryptedPassword = JasyptEncryptor.decryptPBEText(password);
+		if (!decryptedPassword.equals(user.getPassword())) {
+			throw new WialonAccessDeniedException();
+		}
+		
+		AbstractSession wialonSession = null;
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("token", user.getToken());
+		String loginUrl = AppUtils.getURL(appProperties.getProperty("mx.skyguardian.controltower.oauth.login.url"), properties);
+		try {
+			ObjectMapper mapper =  JsonFactory.create();
+			wialonSession = mapper.readValue(HTTP.getJSON(loginUrl, null), WialonSession.class);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new WialonInternalServerError();
@@ -119,4 +145,5 @@ public class SimpleWialonHTTPRequestExecutor implements IWialonHTTPRequestExecut
 		}
 		return new String("Address not available.");
 	}
+
 }
