@@ -31,8 +31,16 @@ http://www.springframework.org/schema/aop http://www.springframework.org/schema/
 		<property name="password" value="sky2013" />
 	</bean>
 	
+	<bean id="surtidorUser" class="mx.skyguardian.controltower.bean.User">
+		<property name="id" value="" />
+		<property name="token" value="" />
+		<property name="user" value="surtidor" />
+		<property name="password" value="000000" />
+	</bean>
+	
 	<util:map id="users" value-type="mx.skyguardian.controltower.bean.User">
-      <entry key="tescobedo" value-ref="tescoUser" />     
+      <entry key="tescobedo" value-ref="tescoUser" />
+      <entry key="surtidor" value-ref="surtidorUser" />     
    </util:map>
 	<!-- END USER CONFIGURATION -->
 	

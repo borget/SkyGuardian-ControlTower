@@ -48,39 +48,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	private Properties appProperties;
 	
 	@Resource(name = "users")
-	private Map<String, User> users;
-
-	public AbstractWialonEntity getUnit(String userName, String password, String unitId) throws WialonInternalServerError, IOException {
-		User user = users.get(userName);
-		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
-		Map<String, String> properties = new HashMap<String, String>();
-		properties.put("unitId", unitId);
-		properties.put("eid", wialonSession.getEid());
-		properties.put("flags", Constants.FLAGS_0x00100401);
-
-		String unitUrl = AppUtils.getURL(appProperties
-				.getProperty("mx.skyguardian.controltower.search.unit.url"),
-				properties);
-		//log.debug("SkyGuardianControlTowerManager.getUnit()-JSON=" + unitUrl);
-		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitUrl);
-		
-		Unit unit = new Unit();
-		if (!itemObj.isNull("item")) {
-			JSONObject jsonItem = (JSONObject) itemObj.get("item");
-			this.setCommonUnitData(unit, wialonSession, jsonItem);
-			JSONObject pObj = getPObject(jsonItem);
-			if(pObj != null){
-				unit.setLastMsgReport((this.jsonDeserializer.getLastMsgReport(pObj)));
-			} else {
-				unit.setLastMsgReport(this.getLastKnownPrms(jsonItem.toString()));
-			}
-			AbstractWialonEntity reportBase = unit.getLastMsgReport();
-			((LastMsgReportBase)reportBase).setFuel_level(this.tryToGetFuelSensor(unitId, wialonSession));
-		}
-//		unit.setLastMsgReport(this.getLastKnownPrms("{\"id\":12219894,\"cls\":2,\"prms\":{\"fuel_cons\":{\"v\":0,\"at\":1417202451,\"ct\":1417201118},\"out7\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out6\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out9\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out8\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out3\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out2\":{\"v\":0,\"at\":1418402733,\"ct\":1415304185},\"out5\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out4\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out1\":{\"v\":0,\"at\":1418402733,\"ct\":1415303985},\"DL\":{\"v\":0,\"at\":1418402733,\"ct\":1418347237},\"od\":{\"v\":\"24936\",\"at\":1418402733,\"ct\":1418353733},\"posinfo\":{\"v\":{\"c\":359,\"sc\":255,\"z\":582,\"y\":25.810233,\"x\":-100.400996},\"at\":1418402733,\"ct\":1418402733},\"j1939_odo\":{\"v\":23284,\"at\":1417202441,\"ct\":1417198350},\"MV\":{\"v\":128,\"at\":1418402733,\"ct\":1418400233},\"pwr_int\":{\"v\":4.2,\"at\":1418402733,\"ct\":1416013731},\"engine\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"gsm\":{\"v\":16,\"at\":1418402733,\"ct\":1418402733},\"hb\":{\"v\":0,\"at\":1418402733,\"ct\":1417116373},\"hc\":{\"v\":0,\"at\":1418402733,\"ct\":1418313084},\"MT\":{\"v\":0,\"at\":1418402733,\"ct\":1418353226},\"ha\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"IN2\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"IN1\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"accel_pos\":{\"v\":78,\"at\":1417202451,\"ct\":1417202421},\"IN0\":{\"v\":0,\"at\":1418402733,\"ct\":1415304425},\"EG\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"in31\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in30\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"gps_status\":{\"v\":0,\"at\":1415058905,\"ct\":1415058905},\"in32\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"TW\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"gsm_status\":{\"v\":9,\"at\":1418402733,\"ct\":1418313270},\"out28\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out29\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out26\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out27\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out24\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"engine_rpm\":{\"v\":1614,\"at\":1417202451,\"ct\":1417202451},\"out25\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out23\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pressure1\":{\"v\":800,\"at\":1417202451,\"ct\":1417202451},\"out22\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pressure2\":{\"v\":800,\"at\":1417202451,\"ct\":1417202451},\"pt_air_pressure\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"out21\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out20\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in29\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in28\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in27\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in26\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in25\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in24\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"snd_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"dl\":{\"v\":0,\"at\":1418402733,\"ct\":1418315082},\"in23\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in22\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"OD\":{\"v\":24936,\"at\":1418402733,\"ct\":1418353733},\"in21\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in20\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pos\":{\"v\":102,\"at\":1417202451,\"ct\":1415303422},\"HB\":{\"v\":0,\"at\":1418402733,\"ct\":1417116373},\"HC\":{\"v\":0,\"at\":1418402733,\"ct\":1418313084},\"HA\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"IMSI\":{\"v\":\"334020520994657\",\"at\":1415058905,\"ct\":1415058905},\"out32\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in19\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"j1939_fuel_level\":{\"v\":100,\"at\":1417202451,\"ct\":1417195929},\"out31\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in18\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"GS\":{\"v\":9,\"at\":1418402733,\"ct\":1418347237},\"in15\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"GQ\":{\"v\":16,\"at\":1418402733,\"ct\":1418402733},\"in14\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"tw\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"out30\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in17\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in16\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in11\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in10\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in13\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"cruise_time\":{\"v\":40,\"at\":1417202441,\"ct\":1417202081},\"in12\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out11\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out12\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out10\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"eng_boost_pressure\":{\"v\":18,\"at\":1417202451,\"ct\":1417202451},\"out19\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out18\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out17\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out16\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out15\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out14\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"bl\":{\"v\":0,\"at\":1418402733,\"ct\":1415304145},\"out13\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"axle2\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"axle3\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"ss\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"firmware_ver\":{\"v\":\"Rev.2.10\",\"at\":1415058905,\"ct\":1415058905},\"axle1\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"motion\":{\"v\":0,\"at\":1418402733,\"ct\":1418353226},\"axle4\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"pto_time\":{\"v\":40,\"at\":1417202441,\"ct\":1417202081},\"AT\":{\"v\":582,\"at\":1418402733,\"ct\":1418402733},\"text\":{\"v\":\"$EGNS=131,10,130,10,1\r\",\"at\":1415316457,\"ct\":1415316457},\"IP\":{\"v\":0,\"at\":1418402733,\"ct\":1417648048},\"odometer\":{\"v\":2493.6,\"at\":1418402733,\"ct\":1418353733},\"gsm_level\":{\"v\":-79,\"at\":1415058905,\"ct\":1415058905},\"sats\":{\"v\":0,\"at\":1415058905,\"ct\":1415058905},\"form_state\":{\"v\":\"\",\"at\":1418403055,\"ct\":1415058188},\"PS\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"report_id\":{\"v\":2,\"at\":1418402733,\"ct\":1418347237},\"total_fuel\":{\"v\":6000,\"at\":1417202441,\"ct\":1417197950},\"JD\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"BV\":{\"v\":42,\"at\":1418402733,\"ct\":1416013731},\"rtc_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"hdop\":{\"v\":0.9,\"at\":1418402733,\"ct\":1418399733},\"model_name\":{\"v\":\"AT1Pro\",\"at\":1415058905,\"ct\":1415058905},\"gps_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"CID\":{\"v\":\"8952020013457546524\",\"at\":1415058905,\"ct\":1415058905},\"temp1\":{\"v\":200,\"at\":1418402733,\"ct\":1407421734},\"temp2\":{\"v\":200,\"at\":1418402733,\"ct\":1407421734},\"SS\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"coolant_temp\":{\"v\":89,\"at\":1417202451,\"ct\":1417202391},\"clutch_times\":{\"v\":0,\"at\":1417202441,\"ct\":1415303422},\"j1939_speed\":{\"v\":8,\"at\":1417202451,\"ct\":1417202451},\"BL\":{\"v\":0,\"at\":1418402733,\"ct\":1415304145},\"in2\":{\"v\":0,\"at\":1418402733,\"ct\":1415304421},\"in1\":{\"v\":0,\"at\":1418402733,\"ct\":1418353233},\"in4\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in3\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"speed\":{\"v\":0,\"at\":1418402733,\"ct\":1418394233},\"brake_times\":{\"v\":0,\"at\":1417202441,\"ct\":1415303422},\"in0\":{\"v\":0,\"at\":1418402733,\"ct\":1415304425},\"pwr_ext\":{\"v\":12.8,\"at\":1418402733,\"ct\":1418400233},\"adc1\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"ip\":{\"v\":0,\"at\":1418402733,\"ct\":1417648048},\"jd\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"IMEI\":{\"v\":\"352964053429123\",\"at\":1415058905,\"ct\":1415058905},\"in9\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in5\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in6\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in7\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"ps\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"out\":{\"v\":0,\"at\":1418402733,\"ct\":1415304185},\"in8\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734}},\"mu\":0,\"uacl\":-1,\"lmsg\":{\"f\":0,\"t\":1418403055,\"p\":{\"form_state\":\"\"},\"tp\":\"ud\",\"pos\":null},\"pos\":{\"t\":1418402733,\"s\":0,\"c\":359,\"sc\":255,\"z\":582,\"y\":25.810233,\"x\":-100.400996},\"nm\":\"DTO1401\"}"));
-
-		return unit;
-	}
+	private Map<String, User> users;	
 	
 	private void setCommonUnitData(Unit unit, AbstractSession wialonSession, JSONObject jsonItem) {
 		unit.setUnitId(Long.parseLong((jsonItem.isNull("id")) ? "0" : jsonItem.get("id").toString()));
@@ -134,9 +102,39 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		return report != null ? report : new LastMsgReportBase();
 	}
 	
+	public AbstractWialonEntity getUnit(String userName, String password, String unitId) throws WialonInternalServerError, IOException {
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, this.getUser(userName));
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("unitId", unitId);
+		properties.put("eid", wialonSession.getEid());
+		properties.put("flags", Constants.FLAGS_0x00100401);
+
+		String unitUrl = AppUtils.getURL(appProperties
+				.getProperty("mx.skyguardian.controltower.search.unit.url"),
+				properties);
+		//log.debug("SkyGuardianControlTowerManager.getUnit()-JSON=" + unitUrl);
+		JSONObject itemObj = httpReqExecutor.getHTTPRequest(unitUrl);
+		
+		Unit unit = new Unit();
+		if (!itemObj.isNull("item")) {
+			JSONObject jsonItem = (JSONObject) itemObj.get("item");
+			this.setCommonUnitData(unit, wialonSession, jsonItem);
+			JSONObject pObj = getPObject(jsonItem);
+			if(pObj != null){
+				unit.setLastMsgReport((this.jsonDeserializer.getLastMsgReport(pObj)));
+			} else {
+				unit.setLastMsgReport(this.getLastKnownPrms(jsonItem.toString()));
+			}
+			AbstractWialonEntity reportBase = unit.getLastMsgReport();
+			((LastMsgReportBase)reportBase).setFuel_level(this.tryToGetFuelSensor(unitId, wialonSession));
+		}
+//		unit.setLastMsgReport(this.getLastKnownPrms("{\"id\":12219894,\"cls\":2,\"prms\":{\"fuel_cons\":{\"v\":0,\"at\":1417202451,\"ct\":1417201118},\"out7\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out6\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out9\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out8\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out3\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out2\":{\"v\":0,\"at\":1418402733,\"ct\":1415304185},\"out5\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out4\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out1\":{\"v\":0,\"at\":1418402733,\"ct\":1415303985},\"DL\":{\"v\":0,\"at\":1418402733,\"ct\":1418347237},\"od\":{\"v\":\"24936\",\"at\":1418402733,\"ct\":1418353733},\"posinfo\":{\"v\":{\"c\":359,\"sc\":255,\"z\":582,\"y\":25.810233,\"x\":-100.400996},\"at\":1418402733,\"ct\":1418402733},\"j1939_odo\":{\"v\":23284,\"at\":1417202441,\"ct\":1417198350},\"MV\":{\"v\":128,\"at\":1418402733,\"ct\":1418400233},\"pwr_int\":{\"v\":4.2,\"at\":1418402733,\"ct\":1416013731},\"engine\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"gsm\":{\"v\":16,\"at\":1418402733,\"ct\":1418402733},\"hb\":{\"v\":0,\"at\":1418402733,\"ct\":1417116373},\"hc\":{\"v\":0,\"at\":1418402733,\"ct\":1418313084},\"MT\":{\"v\":0,\"at\":1418402733,\"ct\":1418353226},\"ha\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"IN2\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"IN1\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"accel_pos\":{\"v\":78,\"at\":1417202451,\"ct\":1417202421},\"IN0\":{\"v\":0,\"at\":1418402733,\"ct\":1415304425},\"EG\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"in31\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in30\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"gps_status\":{\"v\":0,\"at\":1415058905,\"ct\":1415058905},\"in32\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"TW\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"gsm_status\":{\"v\":9,\"at\":1418402733,\"ct\":1418313270},\"out28\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out29\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out26\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out27\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out24\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"engine_rpm\":{\"v\":1614,\"at\":1417202451,\"ct\":1417202451},\"out25\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out23\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pressure1\":{\"v\":800,\"at\":1417202451,\"ct\":1417202451},\"out22\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pressure2\":{\"v\":800,\"at\":1417202451,\"ct\":1417202451},\"pt_air_pressure\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"out21\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out20\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in29\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in28\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in27\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in26\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in25\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in24\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"snd_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"dl\":{\"v\":0,\"at\":1418402733,\"ct\":1418315082},\"in23\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in22\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"OD\":{\"v\":24936,\"at\":1418402733,\"ct\":1418353733},\"in21\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in20\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"brake_pos\":{\"v\":102,\"at\":1417202451,\"ct\":1415303422},\"HB\":{\"v\":0,\"at\":1418402733,\"ct\":1417116373},\"HC\":{\"v\":0,\"at\":1418402733,\"ct\":1418313084},\"HA\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"IMSI\":{\"v\":\"334020520994657\",\"at\":1415058905,\"ct\":1415058905},\"out32\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in19\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"j1939_fuel_level\":{\"v\":100,\"at\":1417202451,\"ct\":1417195929},\"out31\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in18\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"GS\":{\"v\":9,\"at\":1418402733,\"ct\":1418347237},\"in15\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"GQ\":{\"v\":16,\"at\":1418402733,\"ct\":1418402733},\"in14\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"tw\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"out30\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in17\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in16\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in11\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in10\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in13\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"cruise_time\":{\"v\":40,\"at\":1417202441,\"ct\":1417202081},\"in12\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out11\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out12\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out10\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"eng_boost_pressure\":{\"v\":18,\"at\":1417202451,\"ct\":1417202451},\"out19\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out18\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out17\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out16\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out15\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"out14\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"bl\":{\"v\":0,\"at\":1418402733,\"ct\":1415304145},\"out13\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"axle2\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"axle3\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"ss\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"firmware_ver\":{\"v\":\"Rev.2.10\",\"at\":1415058905,\"ct\":1415058905},\"axle1\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"motion\":{\"v\":0,\"at\":1418402733,\"ct\":1418353226},\"axle4\":{\"v\":0,\"at\":1417202451,\"ct\":1415303422},\"pto_time\":{\"v\":40,\"at\":1417202441,\"ct\":1417202081},\"AT\":{\"v\":582,\"at\":1418402733,\"ct\":1418402733},\"text\":{\"v\":\"$EGNS=131,10,130,10,1\r\",\"at\":1415316457,\"ct\":1415316457},\"IP\":{\"v\":0,\"at\":1418402733,\"ct\":1417648048},\"odometer\":{\"v\":2493.6,\"at\":1418402733,\"ct\":1418353733},\"gsm_level\":{\"v\":-79,\"at\":1415058905,\"ct\":1415058905},\"sats\":{\"v\":0,\"at\":1415058905,\"ct\":1415058905},\"form_state\":{\"v\":\"\",\"at\":1418403055,\"ct\":1415058188},\"PS\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"report_id\":{\"v\":2,\"at\":1418402733,\"ct\":1418347237},\"total_fuel\":{\"v\":6000,\"at\":1417202441,\"ct\":1417197950},\"JD\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"BV\":{\"v\":42,\"at\":1418402733,\"ct\":1416013731},\"rtc_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"hdop\":{\"v\":0.9,\"at\":1418402733,\"ct\":1418399733},\"model_name\":{\"v\":\"AT1Pro\",\"at\":1415058905,\"ct\":1415058905},\"gps_tm\":{\"v\":1418402733,\"at\":1418402733,\"ct\":1418402733},\"CID\":{\"v\":\"8952020013457546524\",\"at\":1415058905,\"ct\":1415058905},\"temp1\":{\"v\":200,\"at\":1418402733,\"ct\":1407421734},\"temp2\":{\"v\":200,\"at\":1418402733,\"ct\":1407421734},\"SS\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"coolant_temp\":{\"v\":89,\"at\":1417202451,\"ct\":1417202391},\"clutch_times\":{\"v\":0,\"at\":1417202441,\"ct\":1415303422},\"j1939_speed\":{\"v\":8,\"at\":1417202451,\"ct\":1417202451},\"BL\":{\"v\":0,\"at\":1418402733,\"ct\":1415304145},\"in2\":{\"v\":0,\"at\":1418402733,\"ct\":1415304421},\"in1\":{\"v\":0,\"at\":1418402733,\"ct\":1418353233},\"in4\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in3\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"speed\":{\"v\":0,\"at\":1418402733,\"ct\":1418394233},\"brake_times\":{\"v\":0,\"at\":1417202441,\"ct\":1415303422},\"in0\":{\"v\":0,\"at\":1418402733,\"ct\":1415304425},\"pwr_ext\":{\"v\":12.8,\"at\":1418402733,\"ct\":1418400233},\"adc1\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in\":{\"v\":0,\"at\":1418402733,\"ct\":1418353733},\"ip\":{\"v\":0,\"at\":1418402733,\"ct\":1417648048},\"jd\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"IMEI\":{\"v\":\"352964053429123\",\"at\":1415058905,\"ct\":1415058905},\"in9\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in5\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in6\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"in7\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734},\"ps\":{\"v\":0,\"at\":1418402733,\"ct\":1407421798},\"out\":{\"v\":0,\"at\":1418402733,\"ct\":1415304185},\"in8\":{\"v\":0,\"at\":1418402733,\"ct\":1407421734}},\"mu\":0,\"uacl\":-1,\"lmsg\":{\"f\":0,\"t\":1418403055,\"p\":{\"form_state\":\"\"},\"tp\":\"ud\",\"pos\":null},\"pos\":{\"t\":1418402733,\"s\":0,\"c\":359,\"sc\":255,\"z\":582,\"y\":25.810233,\"x\":-100.400996},\"nm\":\"DTO1401\"}"));
+
+		return unit;
+	}
+	
 	public AbstractWialonEntity getUnits(String userName, String password) throws IOException {
-		User user = users.get(userName);
-		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, this.getUser(userName));
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("sid", wialonSession.getEid());
@@ -180,8 +178,7 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 	
 	@Override
 	public AbstractWialonEntity getVehicles(String userName, String password) throws WialonAccessDeniedException, IOException {
-		User user = users.get(userName);
-		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, this.getUser(userName));
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		properties.put("sid", wialonSession.getEid());
@@ -219,9 +216,8 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		return new Vehicles();
 	}
 	
-	public AbstractWialonEntity getVehiculeHistory(String vehicleId,String interval, String loadCount, String userName, String password) throws WialonAccessDeniedException, IOException {
-		User user = users.get(userName);
-		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, user);
+	public AbstractWialonEntity getVehiculeHistory(String vehicleId,String interval, String loadCount, String userName, String password) throws IOException {
+		AbstractSession wialonSession = this.httpReqExecutor.oAuthLogin(userName, password, this.getUser(userName));
 		
 		Map<String, String> properties = new HashMap<String, String>();
 		Long serverTime = wialonSession.getTm();
@@ -288,6 +284,30 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 		}
 
 		return new VehicleHistory();
+	}
+	
+	public SkyGuardianControlTowerManagerHelper getHelper() {
+		return helper;
+	}
+
+	public void setHelper(SkyGuardianControlTowerManagerHelper helper) {
+		this.helper = helper;
+	}
+	
+	public void setHttpReqExecutor(IWialonHTTPRequestExecutor httpReqExecutor) {
+		this.httpReqExecutor = httpReqExecutor;
+	}
+
+	public void setJsonDeserializer(AbsctractJSONDeserializer jsonDeserializer) {
+		this.jsonDeserializer = jsonDeserializer;
+	}
+
+	public void setAppProperties(Properties appProperties) {
+		this.appProperties = appProperties;
+	}
+	
+	public void setUsers(Map<String, User> users) {
+		this.users = users;
 	}
 	
 	private JSONObject getPObject (JSONObject jsonItem) {
@@ -378,28 +398,12 @@ public class SkyGuardianControlTowerManager implements IControlTowerManager {
 			return fuelSensor;
 		}
 	}
-
-	public SkyGuardianControlTowerManagerHelper getHelper() {
-		return helper;
-	}
-
-	public void setHelper(SkyGuardianControlTowerManagerHelper helper) {
-		this.helper = helper;
-	}
 	
-	public void setHttpReqExecutor(IWialonHTTPRequestExecutor httpReqExecutor) {
-		this.httpReqExecutor = httpReqExecutor;
-	}
-
-	public void setJsonDeserializer(AbsctractJSONDeserializer jsonDeserializer) {
-		this.jsonDeserializer = jsonDeserializer;
-	}
-
-	public void setAppProperties(Properties appProperties) {
-		this.appProperties = appProperties;
-	}
-	
-	public void setUsers(Map<String, User> users) {
-		this.users = users;
+	private User getUser(String userName) {
+		User user = this.users.get(userName);
+		if(user == null) {
+			throw new WialonAccessDeniedException();
+		}
+		return user;
 	}
 }
